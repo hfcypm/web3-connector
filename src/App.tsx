@@ -6,7 +6,7 @@ function App() {
 
   return (
     <>
-      <h1>web3-connector</h1>
+      <h1 className='bg-amber-800 h-20 flex items-center justify-center'>web3-connector</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
