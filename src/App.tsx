@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import './App.css'
+import WalletProvider from './wallet-sdk/provider'
+import { supportChainsConfigs } from './wallet-sdk/chain'
+import type { Wallet } from './wallet-sdk/types';
+
+//钱包数组
+const defWallets: Wallet[] = [];
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <h1 className='bg-red-400 h-20 flex items-center justify-center'>web3-connector</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
+      <WalletProvider chains={supportChainsConfigs} wallets={defWallets}>
+        <h1 className='bg-red-400 h-20 flex items-center justify-center'>web3-connector TEST
+        </h1>
+      </WalletProvider>
     </>
   )
 }
