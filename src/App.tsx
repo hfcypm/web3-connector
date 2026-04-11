@@ -1,8 +1,9 @@
 import { ethers } from 'ethers'
 import './App.css'
-import WalletProvider from './wallet-sdk/provider'
 import { supportChainsConfigs } from './wallet-sdk/chain'
 import type { Wallet } from './wallet-sdk/types';
+//导入provider connectionButton
+import { ConnectionButton, WalletProvider } from './wallet-sdk'
 
 //钱包数组
 const defWallets: Wallet[] = [];
@@ -21,8 +22,7 @@ function App() {
         provider={provider}
         wallets={defWallets}
         autoConnect={true}>
-        <h1 className='bg-red-400 h-20 flex items-center justify-center'>test
-        </h1>
+        <ConnectionButton />
       </WalletProvider>
     </>
   )
