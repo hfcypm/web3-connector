@@ -22,13 +22,14 @@ export default function ConnectionButton({
     size = 'md',
     className = '',
 }: ConnectionButtonProps) {
+    //自定义的钱包一些配置
     const { connect, disconnect, isConnected, address
-        , chaindID, ensName, error } = useWallet();
+        , chaindID, ensName, error, openModal, closeModal } = useWallet();
     const [balance, setBanlance] = useState<string | null>('');
     const sizeClass = {
         sm: 'text-sm px-3 py-1.5',
         md: 'text-md px-4 py-2',
-        lg: 'text-lg px-5 py-2.5', 
+        lg: 'text-lg px-5 py-2.5',
     }
     const handleConnect = async () => {
         try {
@@ -47,7 +48,7 @@ export default function ConnectionButton({
     if (!isConnected) {
         return (
             <button className={`bg-blue-400 text-white font-bold py-2 px-4 rounded hover:bg-blue-500 ${className} ${sizeClass[size]}`}
-                onClick={handleConnect}>{label}</button>
+                onClick={openModal}>{label}</button>
         );
     }
     //已连接状态   断开钱包链接

@@ -4,9 +4,7 @@ import { supportChainsConfigs } from './wallet-sdk/chain'
 import type { Wallet } from './wallet-sdk/types';
 //导入provider connectionButton
 import { ConnectionButton, WalletProvider } from './wallet-sdk'
-
-//钱包数组
-const defWallets: Wallet[] = [];
+import { showWallets } from './wallet-sdk/wallets';
 
 function App() {
   //window.ethereum：是 MetaMask 等钱包注入的原始对象，属于底层 API。
@@ -16,11 +14,12 @@ function App() {
   //     (底层原始对象)                        (ethers 包装器)                    (高级 provider)
   const provider = new ethers.BrowserProvider(window.ethereum)
   return (
+    //所有入参均在此配置--->入口
     <>
       <WalletProvider
         chains={supportChainsConfigs}
         provider={provider}
-        wallets={defWallets}
+        wallets={showWallets}
         autoConnect={true}>
         <ConnectionButton />
       </WalletProvider>
