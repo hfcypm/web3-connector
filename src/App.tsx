@@ -1,7 +1,6 @@
 import { ethers } from 'ethers'
 import './App.css'
 import { supportChainsConfigs } from './wallet-sdk/chain'
-import type { Wallet } from './wallet-sdk/types';
 //导入provider connectionButton
 import { ConnectionButton, WalletProvider } from './wallet-sdk'
 import { showWallets } from './wallet-sdk/wallets';
