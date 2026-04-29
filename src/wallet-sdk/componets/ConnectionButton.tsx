@@ -1,6 +1,6 @@
-import { useState } from 'react'
 import { useWallet } from '../provider'
 import { Globe, Power } from 'lucide-react';
+import { formatEther } from 'ethers';
 
 //自定义当前连接属性
 interface ConnectionButtonProps {
@@ -24,8 +24,8 @@ export default function ConnectionButton({
 }: ConnectionButtonProps) {
     //自定义的钱包一些配置
     const { disconnect, isConnected, address
-        , chaindID, ensName, error, openModal, closeModal, netName } = useWallet();
-    const [balance, setBanlance] = useState<string | null>('');
+        , chaindID, ensName, error, openModal, closeModal
+        , netName, balance } = useWallet();
     const sizeClass = {
         sm: 'text-sm px-3 py-1.5',
         md: 'text-md px-4 py-2',
@@ -39,6 +39,10 @@ export default function ConnectionButton({
             console.log('fail to disconnect wallet', error);
         }
     }
+    //换算成 ETH（Sepolia ETH）
+    const balanceEth = formatEther(balance || '0');
+    //保留4位小数
+    const showBalance = parseFloat(balanceEth).toFixed(4);
     if (isConnected) {
         //已连接状态断开钱包链接
         return (
@@ -55,7 +59,7 @@ export default function ConnectionButton({
                             {/* 显示前5个字符  超出显示省略号 */}
                             <div className='ml-2 w-[5ch] overflow-hidden text-ellipsis whitespace-nowrap'>{address}</div>
                             {/* 余额 */}
-                            <div className='ml-2'>{balance}</div>
+                            <div className='px-2'>{showBalance} ETH</div>
                             <Power className='w-5 h-5 text-gray-500 hover:text-gray-700 cursor-pointer' onClick={handleDisconnect}></Power>
                         </div>
                     </div>

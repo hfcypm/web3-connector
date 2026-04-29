@@ -19,6 +19,7 @@ const connectMetamask = async (): Promise<any> => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const singer = await provider.getSigner();
         const address = await singer.getAddress();
+        const balance = await provider.getBalance(address);
         const { chainId } = await provider.getNetwork();
         //监听用户切换的事件
         window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
@@ -35,7 +36,11 @@ const connectMetamask = async (): Promise<any> => {
             window.dispatchEvent(new CustomEvent('wallet_chain_changed'
                 , { detail: { chainId: newChainId } }));
         });
-        return { accounts, singer, chainId, address };
+        return {
+            accounts, singer, chainId, address, balance,
+            // 标准断开方法（清理所有监听）
+            disconnect: async () => provider.removeAllListeners(),
+        };
     } catch (error) {
         throw new Error('Failed to connect to MetaMask');
     }

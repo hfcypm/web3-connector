@@ -18,7 +18,8 @@ const WalletContext = createContext<WalletContextValue>({
     error: null,
     chains: [],
     provider: undefined,
-    netName: ''
+    netName: '',
+    balance: ''
 });
 
 
@@ -32,7 +33,8 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         ensName: null,
         error: null,
         chains,
-        provider
+        provider,
+        balance: ''
     });
     //弹窗打开及关闭的状态
     const [modalOpen, setModalOpen] = useState(false);
@@ -55,13 +57,14 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
             isConnecting: true,
         }));
         await wallet.connector().then((res) => {
-            const { accounts, singer, chainId, address } = res;
+            const { accounts, singer, chainId, address, balance } = res;
             //打印钱包实际回传的参数对象
             console.log('---------------打印钱包实际回传的参数对象------start----------');
             console.log('accounts', accounts);
             console.log('singer', singer);
             console.log('chainId', chainId);
             console.log('address', address);
+            console.log('balance', balance);
             console.log('---------------打印钱包实际回传的参数对象------end----------');
             //根据返回来chainID获取网络名称
             const netID = Number(chainId);
@@ -74,6 +77,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
                 isConnected: true,
                 isConnecting: false,
                 netName: netName,
+                balance: balance,
             }));
         }).catch(error => {
             //连接失败 返回错误信息

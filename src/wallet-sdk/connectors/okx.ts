@@ -32,6 +32,7 @@ export const okxConnector = async (): Promise<any> => {
         const accounts = await provider.send("eth_requestAccounts", []);
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
+        const balance = await provider.getBalance(address);
         const { chainId } = await provider.getNetwork();
 
         // 3. 监听用户切换的事件
@@ -61,6 +62,7 @@ export const okxConnector = async (): Promise<any> => {
             address,
             chainId,
             provider,
+            balance,
         });
         return {
             accounts,
@@ -68,6 +70,7 @@ export const okxConnector = async (): Promise<any> => {
             address,
             chainId,
             provider,
+            balance,
             // 标准断开方法（清理所有监听）
             disconnect: async () => {
                 try {

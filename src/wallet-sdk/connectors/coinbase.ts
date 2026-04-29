@@ -22,6 +22,7 @@ export const coinbaseConnector = async (): Promise<any> => {
         const accounts = await provider.send('eth_requestAccounts', []);
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
+        const balance = await provider.getBalance(address);
         const { chainId } = await provider.getNetwork();
 
         //监听用户切换的事件
@@ -42,6 +43,7 @@ export const coinbaseConnector = async (): Promise<any> => {
             address,
             chainId,
             provider,
+            balance,
         });
         return {
             accounts,
@@ -49,6 +51,7 @@ export const coinbaseConnector = async (): Promise<any> => {
             address,
             chainId,
             provider,
+            balance,
             disconnect: async () => provider.removeAllListeners()
         };
     } catch (error) {

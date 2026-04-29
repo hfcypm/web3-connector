@@ -21,6 +21,9 @@ export interface WalletState {
     isConnecting: boolean;
     // 是否连接
     isConnected: boolean;
+    //余额余额
+    balance: string | null;
+    //ENS名称
     ensName: string | null;
     //错误
     error: Error | null;
