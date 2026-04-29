@@ -19,19 +19,19 @@ export const WalletModal = ({ isOpen, onClose, wallets, onSelectWallet, connecti
                 onClick={onClose}>
 
                 {/* 弹窗内容 */}
-                <div className='bg-white p-8 rounded-2xl'>
+                <div className='bg-white w-100 p-8 rounded-2xl'>
                     <h2 className='text-2xl font-bold mb-4'>Select a Wallet</h2>
                     <div className='space-y-4 max-h-[60vh] overflow-y-auto pr-2'></div>
                     {/* 支持的钱包列表 */}
                     {
                         wallets.map((wallet) => (
-                            <div key={wallet.id} className='flex items-center justify-center hover:bg-gray-100'
+                            <div key={wallet.id} className='flex items-center hover:bg-gray-100 py-3'
                                 onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
                                     //阻止外层默认事件(不然点击列表条目也关闭整个弹窗)
                                     e.stopPropagation();
                                     onSelectWallet(wallet);
                                 }}>
-                                <img src={wallet.icon} alt={wallet.name} className='w-8 h-8 ml-2' />
+                                <img src={wallet.icon} alt={wallet.name} className='w-10 h-10' />
                                 <span className='ml-4 text-sm'>{wallet.name}</span>
                             </div>
                         ))
