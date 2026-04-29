@@ -28,6 +28,8 @@ export interface WalletState {
     chains: Chain[];
     //provider
     provider: any;
+    //网络名称
+    netName: string;
 }
 
 export interface WalletContextValue extends WalletState {

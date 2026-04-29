@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, useMemo } from "react";
 import type { Wallet, WalletContextValue, WalletProviderProps, WalletState } from "../types";
 import { WalletModal } from "../componets/WalletModal";
+import { chainIDNameDict } from "../const/network";
 
 
 const WalletContext = createContext<WalletContextValue>({
@@ -16,102 +17,128 @@ const WalletContext = createContext<WalletContextValue>({
     ensName: null,
     error: null,
     chains: [],
-    provider: undefined
+    provider: undefined,
+    netName: ''
 });
 
 
-export const WalletProvider: React.FC<WalletProviderProps>
-    = ({ children, chains, provider, autoConnect, wallets }) => {
+export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains, provider, autoConnect, wallets }) => {
+    const [state, setState] = useState<WalletState>({
+        address: '',
+        chaindID: 0,
+        netName: '',
+        isConnecting: false,
+        isConnected: false,
+        ensName: null,
+        error: null,
+        chains,
+        provider
+    });
+    //弹窗打开及关闭的状态
+    const [modalOpen, setModalOpen] = useState(false);
+    //缓存用户连接的钱包的字典(使用memo 把数组转换为字典存储)
+    const wallletDict = useMemo(() => {
+        return wallets.reduce((acc, wallet) => {
+            acc[wallet.id] = wallet;
+            return acc;
+        }, {} as Record<string, Wallet>);
+    }, [wallets]);
 
-        const [state, setState] = useState<WalletState>({
-            address: '',
-            chaindID: 0,
-            isConnecting: false,
-            isConnected: false,
-            ensName: null,
-            error: null,
-            chains,
-            provider
+    const connect = async (walletId: string) => {
+        //触发用户在列表选择的钱包类型回调
+        const wallet = wallletDict[walletId] || {};
+        if (!wallet) {
+            throw new Error(`wallet not found! walletId: ${walletId}`)
+        }
+        setState(prevState => ({
+            ...prevState,
+            isConnecting: true,
+        }));
+        await wallet.connector().then((res) => {
+            const { accounts, singer, chainId, address } = res;
+            //打印钱包实际回传的参数对象
+            console.log('---------------打印钱包实际回传的参数对象------start----------');
+            console.log('accounts', accounts);
+            console.log('singer', singer);
+            console.log('chainId', chainId);
+            console.log('address', address);
+            console.log('---------------打印钱包实际回传的参数对象------end----------');
+            //根据返回来chainID获取网络名称
+            const netID = Number(chainId);
+            const netName = chainIDNameDict[netID] || 'Unknown Network';
+            //用户实际发送连接请求指定钱包功能
+            setState(prevState => ({
+                ...prevState,
+                address: address,
+                chaindID: chainId,
+                isConnected: true,
+                isConnecting: false,
+                netName: netName,
+            }));
+        }).catch(error => {
+            //连接失败 返回错误信息
+            setState(prevState => ({
+                ...prevState,
+                isConnecting: false,
+                error: error as Error,
+            }));
         });
-        //弹窗打开及关闭的状态
-        const [modalOpen, setModalOpen] = useState(false);
-        //缓存用户连接的钱包的字典(使用memo 把数组转换为字典存储)
-        const wallletDict = useMemo(() => {
-            return wallets.reduce((acc, wallet) => {
-                acc[wallet.id] = wallet;
-                return acc;
-            }, {} as Record<string, Wallet>);
-        }, [wallets]);
+    };
 
-        const value: WalletContextValue = {
-            ...state,
-            connect: async (walletId: string) => {
-                //todo:触发用户在列表选择的钱包类型回调
-                const wallet = wallletDict[walletId] || {};
-                if (!wallet) {
-                    throw new Error(`wallet not found! walletId: ${walletId}`)
-                }
-                setState({
-                    ...state,
-                    isConnecting: true,
-                });
-                await wallet.connector().then((res) => {
-                    //todo:用户实际发送连接请求指定钱包功能
-
-                }).catch(error => {
-                    //连接失败 返回错误信息
-                    setState({
-                        ...state,
-                        isConnecting: false,
-                        error: error as Error,
-                    });
-                });
-            },
-            disconnect: async () => {
-
-            },
-            isConnecting: false,
-            isConnected: false,
+    const disconnect = async () => {
+        setState(prevState => ({
+            ...prevState,
             address: '',
             chaindID: 0,
-            swichChain: async () => {
+            isConnected: false,
+            netName: '',
+        }));
+    };
 
-            },
-            openModal: function (): void {
-                setModalOpen(true);
-            },
-            closeModal: function (): void {
-                setModalOpen(false);
-            },
-            ensName: null,
-            error: null,
-            chains,
-            provider
-        };
+    const swichChain = async () => {
 
-        useEffect(() => {
-            if (autoConnect) {
-                //value.connect();
-            }
-        }, []);
+    };
 
-        return (
-            <WalletContext.Provider value={value}>
-                {children}
-                <WalletModal
-                    isOpen={modalOpen}
-                    onClose={() => setModalOpen(false)}
-                    wallets={wallets}
-                    onSelectWallet={(wallet) => {
-                        //todo:触发用户在列表选择的钱包类型回调
-                        value.connect(wallet.id)
-                    }}
-                    connecting={false}
-                    error={null}
-                />
-            </WalletContext.Provider>
-        );
-    }
+    const openModal = () => {
+        setModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalOpen(false);
+    };
+
+    const value: WalletContextValue = {
+        ...state,
+        connect,
+        disconnect,
+        swichChain,
+        openModal,
+        closeModal,
+    };
+
+    useEffect(() => {
+        if (autoConnect) {
+            //value.connect();
+        }
+    }, []);
+
+    return (
+        <WalletContext.Provider value={value}>
+            {children}
+            <WalletModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                wallets={wallets}
+                onSelectWallet={(wallet) => {
+                    //触发用户在列表选择的钱包类型回调
+                    connect(wallet.id)
+                }}
+                connecting={state.isConnecting}
+                error={state.error}
+            />
+        </WalletContext.Provider>
+    );
+}
 
 
 //导出钱包上下文Hook、用于在组件中获取钱包上下文值
@@ -125,5 +152,3 @@ export const useWallet = (): WalletContextValue => {
 
 //外层包裹组件、用于提供钱包上下文
 export default WalletProvider
-
-

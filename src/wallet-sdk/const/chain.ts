@@ -1,4 +1,4 @@
-export const supportChainsConfigs = [{
+    export const supportChainsConfigs = [{
     id: 1,
     name: "Ethereum Mainnet",
     rpc: "https://eth-mainnet.g.alchemy.com/v2/your-api-key",

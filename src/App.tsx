@@ -1,9 +1,9 @@
 import { ethers } from 'ethers'
-import './App.css'
-import { supportChainsConfigs } from './wallet-sdk/chain'
 //导入provider connectionButton
 import { ConnectionButton, WalletProvider } from './wallet-sdk'
-import { showWallets } from './wallet-sdk/wallets';
+import { supportChainsConfigs } from './wallet-sdk/const/chain'
+import { showWallets } from './wallet-sdk/const/wallets'
+import './App.css'
 
 function App() {
   //window.ethereum：是 MetaMask 等钱包注入的原始对象，属于底层 API。
@@ -20,7 +20,9 @@ function App() {
         provider={provider}
         wallets={showWallets}
         autoConnect={true}>
-        <ConnectionButton />
+        <div className='flex flex-1'>
+          <ConnectionButton />
+        </div>
       </WalletProvider>
     </>
   )
