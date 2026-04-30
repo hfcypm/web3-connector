@@ -67,5 +67,5 @@ export const coinbaseWallet: Wallet = {
     icon: 'https://static-assets.coinbase.com/ui-infra/illustration/v1/pictogram/svg/light/coinbaseLogoNavigation-2.svg',
     description: 'Coinbase Wallet is a secure, easy-to-use, and free app for accessing crypto on the Ethereum blockchain.',
     installed: isCoinbaseWalletInstalled(),
-    downLoadLink: 'https://www.coinbase.com/'
+    downloadLink: 'https://www.coinbase.com/'
 }

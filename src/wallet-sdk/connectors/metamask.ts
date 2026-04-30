@@ -58,5 +58,5 @@ export const metaMaskWallet: Wallet = {
     //是否安装
     installed: false,
     //下载链接
-    downLoadLink: 'https://metamask.io/',
+    downloadLink: 'https://metamask.io/',
 }

@@ -96,5 +96,5 @@ export const okxWallet: Wallet = {
     //是否安装
     installed: isOkxWalletInstalled(),
     //下载链接
-    downLoadLink: 'https://www.okx.com/',
+    downloadLink: 'https://www.okx.com/',
 }

@@ -61,8 +61,7 @@ export interface Wallet {
     description?: string;
     //是否安装
     installed?: boolean;
-    //下载链接
-    downLoadLink?: string;
+    downloadLink?: string;
 }
 
 
