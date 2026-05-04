@@ -88,7 +88,7 @@ export const okxConnector = async (): Promise<any> => {
 export const okxWallet: Wallet = {
     id: 'okx',
     name: 'OKX Wallet',
-    icon: 'https://static.okx.com/cdn/assets/imgs/247/58E63FEA47A2B7D7.png',
+    icon: new URL("../../assets/okx.png", import.meta.url).href,
     //钱包连接器
     connector: okxConnector,
     //钱包描述

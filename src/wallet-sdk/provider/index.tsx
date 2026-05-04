@@ -79,6 +79,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
                 netName: netName,
                 balance: balance,
             }));
+            closeModal();
         }).catch(error => {
             //连接失败 返回错误信息
             setState(prevState => ({
@@ -86,6 +87,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
                 isConnecting: false,
                 error: error as Error,
             }));
+            closeModal();
         });
     };
 

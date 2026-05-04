@@ -11,8 +11,6 @@ function isPhantomWalletInstalled(): boolean {
     return !!phantom || (!!ethereum && ethereum.isPhantom === true);
 }
 
-0x87897CddD8EE989E029B3Dc41ccFD037DF649E65
-
 export const phantomConnector = async (): Promise<any> => {
     if (!isPhantomWalletInstalled()) {
         throw new Error('Phantom Wallet is not installed');
@@ -76,7 +74,7 @@ export const phantomConnector = async (): Promise<any> => {
 export const phantomWallet: Wallet = {
     id: 'phantom',
     name: 'Phantom',
-    icon: 'https://pbs.twimg.com/profile_images/1566776760141418497/cXWxO96H_400x400.jpg',
+    icon: new URL("../../assets/phantom.png", import.meta.url).href,
     connector: phantomConnector,
     description: 'Phantom is a secure, non-custodial wallet for Ethereum, Solana, and other blockchains.',
     installed: isPhantomWalletInstalled(),

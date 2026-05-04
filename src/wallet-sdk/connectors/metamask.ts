@@ -50,7 +50,7 @@ const connectMetamask = async (): Promise<any> => {
 export const metaMaskWallet: Wallet = {
     id: 'metamask',
     name: 'MetaMask',
-    icon: 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg',
+    icon: new URL("../../assets/metamask.svg", import.meta.url).href,
     //钱包连接器
     connector: connectMetamask,
     //钱包描述

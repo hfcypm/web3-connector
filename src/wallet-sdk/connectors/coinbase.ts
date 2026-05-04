@@ -1,4 +1,3 @@
-
 import type { Wallet } from "../types";
 import { ethers } from "ethers";
 
@@ -63,8 +62,8 @@ export const coinbaseConnector = async (): Promise<any> => {
 export const coinbaseWallet: Wallet = {
     id: 'coinbase',
     name: 'Coinbase',
+    icon: new URL("../../assets/coinbase.svg", import.meta.url).href,
     connector: coinbaseConnector,
-    icon: 'https://static-assets.coinbase.com/ui-infra/illustration/v1/pictogram/svg/light/coinbaseLogoNavigation-2.svg',
     description: 'Coinbase Wallet is a secure, easy-to-use, and free app for accessing crypto on the Ethereum blockchain.',
     installed: isCoinbaseWalletInstalled(),
     downloadLink: 'https://www.coinbase.com/'
