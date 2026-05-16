@@ -68,6 +68,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
             console.log('---------------打印钱包实际回传的参数对象------end----------');
             //根据返回来chainID获取网络名称
             const netID = Number(chainId);
+            console.log('netID:>>>>', netID);
             const netName = chainIDNameDict[netID] || 'Unknown Network';
             //用户实际发送连接请求指定钱包功能
             setState(prevState => ({
