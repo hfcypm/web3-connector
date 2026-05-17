@@ -15,8 +15,8 @@ export type Chain = {
 export interface WalletState {
     //钱包地址
     address: string | null;
-    //钱包ID
-    chaindID: number;
+    //当前连接钱包ID
+    currentConnectwalletID: string;
     //是否正在连接
     isConnecting: boolean;
     // 是否连接
@@ -33,6 +33,8 @@ export interface WalletState {
     provider: any;
     //网络名称
     netName: string;
+    //链路ID
+    chaindID: number;
 }
 
 export interface WalletContextValue extends WalletState {

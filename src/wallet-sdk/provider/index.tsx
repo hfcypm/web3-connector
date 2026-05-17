@@ -9,6 +9,7 @@ const WalletContext = createContext<WalletContextValue>({
     disconnect: async () => { },
     isConnecting: false,
     isConnected: false,
+    currentConnectwalletID: '',
     address: '',
     chaindID: 0,
     swichChain: async () => { },
@@ -26,7 +27,7 @@ const WalletContext = createContext<WalletContextValue>({
 export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains, provider, autoConnect, wallets }) => {
     const [state, setState] = useState<WalletState>({
         address: '',
-        chaindID: 0,
+        currentConnectwalletID: '',
         netName: '',
         isConnecting: false,
         isConnected: false,
@@ -34,7 +35,8 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         error: null,
         chains,
         provider,
-        balance: ''
+        balance: '',
+        chaindID: 0,
     });
     //弹窗打开及关闭的状态
     const [modalOpen, setModalOpen] = useState(false);
@@ -47,6 +49,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
     }, [wallets]);
 
     const connect = async (walletId: string) => {
+        console.log('开始连接钱包:>>>>', walletId);
         //触发用户在列表选择的钱包类型回调
         const wallet = wallletDict[walletId] || {};
         if (!wallet) {
@@ -55,8 +58,9 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         setState(prevState => ({
             ...prevState,
             isConnecting: true,
+            currentConnectwalletID: walletId,
         }));
-        await wallet.connector().then((res) => {
+        wallet.connector().then((res) => {
             const { accounts, singer, chainId, address, balance } = res;
             //打印钱包实际回传的参数对象
             console.log('---------------打印钱包实际回传的参数对象------start----------');
@@ -142,6 +146,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
                 }}
                 connecting={state.isConnecting}
                 error={state.error}
+                connectionWalletID={state.currentConnectwalletID}
             />
         </WalletContext.Provider>
     );

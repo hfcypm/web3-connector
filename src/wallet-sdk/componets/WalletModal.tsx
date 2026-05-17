@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Wallet } from '../types';
+import { Loading } from './Loading'
 
 interface WalletModalProps {
     isOpen: boolean;
@@ -8,8 +9,10 @@ interface WalletModalProps {
     onSelectWallet: (wallet: Wallet) => void;
     connecting: boolean;
     error: Error | null;
+    connectionWalletID: string;//当前选择的钱包ID
 }
-export const WalletModal = ({ isOpen, onClose, wallets, onSelectWallet, connecting, error }: WalletModalProps) => {
+export const WalletModal = ({ isOpen, onClose, wallets, onSelectWallet
+    , connecting, error, connectionWalletID }: WalletModalProps) => {
     if (!isOpen) {
         return null;
     }
@@ -25,7 +28,7 @@ export const WalletModal = ({ isOpen, onClose, wallets, onSelectWallet, connecti
                     {/* 支持的钱包列表 */}
                     {
                         wallets.map((wallet) => (
-                            <div key={wallet.id} className='flex items-center hover:bg-gray-100 py-3'
+                            <div key={wallet.id} className='flex items-center  hover:bg-gray-100 py-3 w-full rounded-lg px-3'
                                 onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
                                     //阻止外层默认事件(不然点击列表条目也关闭整个弹窗)
                                     e.stopPropagation();
@@ -33,6 +36,11 @@ export const WalletModal = ({ isOpen, onClose, wallets, onSelectWallet, connecti
                                 }}>
                                 <img src={wallet.icon} alt={wallet.name} className='w-10 h-10' />
                                 <span className='ml-4 text-sm'>{wallet.name}</span>
+                                <div className='ml-auto'>
+                                    {
+                                        connecting && wallet.id === connectionWalletID && <Loading />
+                                    }
+                                </div>
                             </div>
                         ))
                     }
