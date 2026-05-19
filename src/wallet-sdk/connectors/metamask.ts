@@ -1,9 +1,8 @@
 import { ethers } from "ethers";
 import type { Wallet } from "../types";
-
+import { useState } from "react";
 //连接metaMask wallet
 const connectMetamask = async (): Promise<any> => {
-
     //1.判断是否安装了metamask
     if (!window.ethereum) {
         throw new Error('MetaMask is not installed');
@@ -21,8 +20,17 @@ const connectMetamask = async (): Promise<any> => {
         const address = await singer.getAddress();
         const balance = await provider.getBalance(address);
         const { chainId } = await provider.getNetwork();
+        //监听余额变化事件
+        provider.on('block', async () => {
+            const balance = await provider.getBalance(address);
+            console.log('metamask 区块变化，重新获取余额度发送事件：', 'wallet-balance-changed'
+                , "balance:", balance);
+            window.dispatchEvent(new CustomEvent('wallet-balance-changed'
+                , { detail: { balance } }));
+        });
         //监听用户切换的事件
         window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
+            console.log('metamask 用户变化，发送事件：', 'wallet-connected');
             if (newAccounts.length === 0) {
                 window.dispatchEvent(new CustomEvent('wallet-disconnected'));
             } else {
@@ -33,6 +41,7 @@ const connectMetamask = async (): Promise<any> => {
         //监听区块链网络的切换事件
         window.ethereum.on('chainChanged', (newChainIDHex: string) => {
             const newChainId = parseInt(newChainIDHex);
+            console.log('metamask 网络变化，发送事件：', 'wallet_chain_changed');
             window.dispatchEvent(new CustomEvent('wallet_chain_changed'
                 , { detail: { chainId: newChainId } }));
         });

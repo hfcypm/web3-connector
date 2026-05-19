@@ -12,7 +12,7 @@ interface WalletModalProps {
     connectionWalletID: string;//当前选择的钱包ID
 }
 export const WalletModal = ({ isOpen, onClose, wallets, onSelectWallet
-    , connecting, error, connectionWalletID }: WalletModalProps) => {
+    , connecting, connectionWalletID }: WalletModalProps) => {
     if (!isOpen) {
         return null;
     }

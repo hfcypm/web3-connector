@@ -48,6 +48,70 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         }, {} as Record<string, Wallet>);
     }, [wallets]);
 
+    // 处理网络切换事件
+    const handleChainChanged = (event: Event) => {
+        console.log('wallet 网络变化，收到事件：', 'wallet_chain_changed');
+        const customEvent = event as CustomEvent;
+        const { chainId } = customEvent.detail;
+        const netID = Number(chainId);
+        const netName = chainIDNameDict[netID] || 'Unknown Network';
+        
+        // 更新网络信息
+        setState(prevState => ({
+            ...prevState,
+            chaindID: chainId,
+            netName: netName,
+        }));
+        
+        // 如果已连接钱包，刷新余额（因为不同网络的余额不同）
+        if (state.isConnected && state.address && state.provider) {
+            state.provider.getBalance(state.address).then((newBalance: any) => {
+                setState(prevState => ({
+                    ...prevState,
+                    balance: newBalance.toString(),
+                }));
+            }).catch((error: any) => {
+                console.error('Failed to refresh balance after chain change:', error);
+            });
+        }
+        
+        console.log('Network switched to:', netName, 'Chain ID:', chainId);
+    };
+
+    // 处理账户连接事件
+    const handleWalletConnected = (event: Event) => {
+        const customEvent = event as CustomEvent;
+        const { account } = customEvent.detail;
+        if (account && account.length > 0) {
+            const address = account[0];
+            setState(prevState => ({
+                ...prevState,
+                address: address,
+                isConnected: true,
+            }));
+        }
+    };
+
+    // 处理钱包断开连接事件
+    const handleWalletDisconnected = () => {
+        setState(prevState => ({
+            ...prevState,
+            address: '',
+            chaindID: 0,
+            isConnected: false,
+            netName: '',
+            balance: '',
+        }));
+    };
+
+    const handleBalanceChanged = (event: Event) => {
+        const customEvent = event as CustomEvent;
+        const { balance } = customEvent.detail;
+        setState(prevState => ({
+            ...prevState,
+            balance: balance as string,
+        }));
+    };
     const connect = async (walletId: string) => {
         console.log('开始连接钱包:>>>>', walletId);
         //触发用户在列表选择的钱包类型回调
@@ -126,6 +190,20 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         openModal,
         closeModal,
     };
+
+    // 添加全局事件监听器
+    useEffect(() => {
+        window.addEventListener('wallet_chain_changed', handleChainChanged);
+        window.addEventListener('wallet-connected', handleWalletConnected);
+        window.addEventListener('wallet-disconnected', handleWalletDisconnected);
+        window.addEventListener('wallet-balance-changed',handleBalanceChanged);
+        return () => {
+            window.removeEventListener('wallet_chain_changed', handleChainChanged);
+            window.removeEventListener('wallet-connected', handleWalletConnected);
+            window.removeEventListener('wallet-disconnected', handleWalletDisconnected);
+            window.removeEventListener('wallet-balance-changed',handleBalanceChanged);
+        };
+    }, [state.isConnected, state.address, state.provider]);
 
     useEffect(() => {
         if (autoConnect) {
