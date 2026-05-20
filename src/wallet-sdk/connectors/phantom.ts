@@ -75,8 +75,8 @@ export const phantomConnector = async (): Promise<any> => {
                 // 1. 清理 Ethers provider 的监听（包括 block）
                 provider.removeAllListeners();
                 // 2. 清理 MetaMask 的监听（包括 accountsChanged 和 chainChanged）
-                window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
-                window.ethereum.removeListener("chainChanged", handleChainChanged);
+                phantomProvider.removeListener("accountsChanged", handleAccountsChanged);
+                phantomProvider.removeListener("chainChanged", handleChainChanged);
             },
         };
     } catch (error) {

@@ -90,11 +90,9 @@ export const okxConnector = async (): Promise<any> => {
             balance,
             // 标准断开方法（清理所有监听）
             disconnect: async () => {
-                // 1. 清理 Ethers provider 的监听（包括 block）
                 provider.removeAllListeners();
-                // 2. 清理 MetaMask 的监听（包括 accountsChanged 和 chainChanged）
-                window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
-                window.ethereum.removeListener("chainChanged", handleChainChanged);
+                okxProvider.removeListener("accountsChanged", handleAccountsChanged);
+                okxProvider.removeListener("chainChanged", handleChainChanged);
             },
         };
     } catch (error) {
