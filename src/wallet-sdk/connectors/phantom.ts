@@ -50,7 +50,7 @@ export const phantomConnector = async (): Promise<any> => {
                     , { detail: { account: newAccounts } }));
             }
         };
-        window.ethereum.on('accountsChanged', handleAccountsChanged);
+        phantomProvider.on('accountsChanged', handleAccountsChanged);
         //监听区块链网络的切换事件
         const handleChainChanged = (newChainIDHex: string) => {
             const newChainId = parseInt(newChainIDHex);
@@ -58,7 +58,7 @@ export const phantomConnector = async (): Promise<any> => {
             window.dispatchEvent(new CustomEvent('wallet-chain-changed'
                 , { detail: { chainId: newChainId } }));
         };
-        window.ethereum.on('chainChanged', handleChainChanged);
+        phantomProvider.on('chainChanged', handleChainChanged);
 
         phantomProvider.on("disconnect", () => {
             window.dispatchEvent(new CustomEvent("wallet-disconnected"));
