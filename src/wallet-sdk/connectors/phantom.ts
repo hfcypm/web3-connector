@@ -18,7 +18,6 @@ export const phantomConnector = async (): Promise<any> => {
     try {
         const win = window as any;
         // 获取原始的钱包扩展实例用于事件监听
-        const phantomExtension = win.phantom?.ethereum || win.ethereum;
         const phantomProvider = win.phantom?.ethereum || win.ethereum;
 
         const provider = new ethers.BrowserProvider(phantomProvider);
@@ -41,25 +40,28 @@ export const phantomConnector = async (): Promise<any> => {
         };
         provider.on('block', handleBlock);
 
-        // 事件监听应该绑定到原始的钱包扩展实例
-        phantomExtension.on("accountsChanged", (newAccounts: string[]) => {
-            window.dispatchEvent(
-                new CustomEvent("wallet_accounts_changed", {
-                    detail: { account: newAccounts?.[0] || null },
-                })
-            );
-        });
+        //监听用户切换的事件
+        const handleAccountsChanged = (newAccounts: string[]) => {
+            console.log('phantom 用户变化，发送事件：', 'wallet-connected');
+            if (newAccounts.length === 0) {
+                window.dispatchEvent(new CustomEvent('wallet-disconnected'));
+            } else {
+                window.dispatchEvent(new CustomEvent('wallet-connected'
+                    , { detail: { account: newAccounts } }));
+            }
+        };
+        window.ethereum.on('accountsChanged', handleAccountsChanged);
+        //监听区块链网络的切换事件
+        const handleChainChanged = (newChainIDHex: string) => {
+            const newChainId = parseInt(newChainIDHex);
+            console.log('phantom 网络变化，发送事件：', 'wallet-chain-changed');
+            window.dispatchEvent(new CustomEvent('wallet-chain-changed'
+                , { detail: { chainId: newChainId } }));
+        };
+        window.ethereum.on('chainChanged', handleChainChanged);
 
-        phantomExtension.on("chainChanged", (chainId: string) => {
-            window.dispatchEvent(
-                new CustomEvent("wallet_chain_changed", {
-                    detail: { chainId },
-                })
-            );
-        });
-
-        phantomExtension.on("disconnect", () => {
-            window.dispatchEvent(new CustomEvent("wallet_disconnected"));
+        phantomProvider.on("disconnect", () => {
+            window.dispatchEvent(new CustomEvent("wallet-disconnected"));
         });
 
         return {
@@ -73,8 +75,8 @@ export const phantomConnector = async (): Promise<any> => {
                 // 1. 清理 Ethers provider 的监听（包括 block）
                 provider.removeAllListeners();
                 // 2. 清理 MetaMask 的监听（包括 accountsChanged 和 chainChanged）
-                window.ethereum.removeListener('accountsChanged');
-                window.ethereum.removeListener('chainChanged');
+                window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+                window.ethereum.removeListener("chainChanged", handleChainChanged);
             },
         };
     } catch (error) {

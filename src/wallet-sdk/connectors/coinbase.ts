@@ -38,13 +38,20 @@ export const coinbaseConnector = async (): Promise<any> => {
         provider.on('block', handleBlock);
 
         //监听用户切换的事件
-        coinbaseWalletExtension.on('accountsChanged', (newAccounts: string[]) => {
-            window.dispatchEvent(new CustomEvent('wallet_accounts_changed', { detail: { newAccounts } }));
-        });
+        const handleAccountsChanged = async (newAccounts: string[]) => {
+            console.log('coinbase 用户切换，发送事件：', 'wallet-accounts-changed');
+            if (newAccounts.length === 0) {
+                window.dispatchEvent(new CustomEvent('wallet-disconnected'));
+            } else {
+                window.dispatchEvent(new CustomEvent('wallet-accounts-changed', { detail: { newAccounts } }));
+            }
+        }
+        coinbaseWalletExtension.on('accountsChanged', handleAccountsChanged);
         //监听区块链网络的切换事件
-        coinbaseWalletExtension.on('chainChanged', () => {
+        const handleChainChanged = () => {
             window.dispatchEvent(new CustomEvent('wallet_chain_changed', { detail: { chainId } }));
-        });
+        };
+        coinbaseWalletExtension.on('chainChanged', handleChainChanged);
         //断开连接
         coinbaseWalletExtension.on('disconnect', (error: any) => {
             window.dispatchEvent(new CustomEvent('wallet_disconnected', { detail: error }));
@@ -68,8 +75,8 @@ export const coinbaseConnector = async (): Promise<any> => {
                 // 1. 清理 Ethers provider 的监听（包括 block）
                 provider.removeAllListeners();
                 // 2. 清理 Coinbase Wallet 的监听（包括 accountsChanged 和 chainChanged）
-                window.ethereum.removeListener('accountsChanged');
-                window.ethereum.removeListener('chainChanged');
+                window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+                window.ethereum.removeListener('chainChanged', handleChainChanged);
             }
         };
     } catch (error) {

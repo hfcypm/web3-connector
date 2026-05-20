@@ -48,24 +48,29 @@ export const okxConnector = async (): Promise<any> => {
         provider.on('block', handleBlock);
 
         // 3. 监听用户切换的事件
-        okxProvider.on("accountsChanged", (newAccounts: string[]) => {
-            window.dispatchEvent(
-                new CustomEvent("wallet_accounts_changed", {
-                    detail: { account: newAccounts?.[0] || null },
-                })
-            );
-        });
-        // 4. 监听区块链网络的切换事件（事件名必须是 chainChanged）
-        okxProvider.on("chainChanged", (chainId: string) => {
+        const handleAccountsChanged = async (newAccounts: string[]) => {
+            console.log('okx wallet 用户变化，发送事件：', 'wallet-connected');
+            if (newAccounts.length === 0) {
+                window.dispatchEvent(new CustomEvent('wallet-disconnected'));
+            } else {
+                window.dispatchEvent(new CustomEvent('wallet-connected'
+                    , { detail: { account: newAccounts } }));
+            }
+        }
+        okxProvider.on("accountsChanged", handleAccountsChanged);
+        const handleChainChanged = async (chainId: string) => {
+            console.log('okx wallet 区块链网络切换，发送事件：', 'wallet-chain-changed', "chainId:", chainId);
             window.dispatchEvent(
                 new CustomEvent("wallet_chain_changed", {
                     detail: { chainId },
                 })
             );
-        });
+        };
+        // 4. 监听区块链网络的切换事件（事件名必须是 chainChanged）
+        okxProvider.on("chainChanged", handleChainChanged);
         // 5. 断开连接
         okxProvider.on("disconnect", () => {
-            window.dispatchEvent(new CustomEvent("wallet_disconnected"));
+            window.dispatchEvent(new CustomEvent("wallet-disconnected"));
         });
         //打印当前连接信息
         console.log('okx wallet info:::::', {
@@ -85,11 +90,11 @@ export const okxConnector = async (): Promise<any> => {
             balance,
             // 标准断开方法（清理所有监听）
             disconnect: async () => {
-               // 1. 清理 Ethers provider 的监听（包括 block）
+                // 1. 清理 Ethers provider 的监听（包括 block）
                 provider.removeAllListeners();
                 // 2. 清理 MetaMask 的监听（包括 accountsChanged 和 chainChanged）
-                window.ethereum.removeListener('accountsChanged');
-                window.ethereum.removeListener('chainChanged');
+                window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+                window.ethereum.removeListener("chainChanged", handleChainChanged);
             },
         };
     } catch (error) {
