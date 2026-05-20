@@ -20,14 +20,20 @@ const connectMetamask = async (): Promise<any> => {
         const address = await singer.getAddress();
         const balance = await provider.getBalance(address);
         const { chainId } = await provider.getNetwork();
+
+        //初始化余额
+        let lastBalance = balance;
+        // 余额变化处理
+        const handleBlock = async () => {
+            const newBalance = await provider.getBalance(address);
+            if (lastBalance !== newBalance) {
+                lastBalance = newBalance;
+                console.log('metamask 区块变化，重新获取余额发送事件：', 'wallet-balance-changed', "balance:", newBalance);
+                window.dispatchEvent(new CustomEvent('wallet-balance-changed', { detail: { balance: newBalance } }));
+            }
+        };
         //监听余额变化事件
-        provider.on('block', async () => {
-            const balance = await provider.getBalance(address);
-            console.log('metamask 区块变化，重新获取余额度发送事件：', 'wallet-balance-changed'
-                , "balance:", balance);
-            window.dispatchEvent(new CustomEvent('wallet-balance-changed'
-                , { detail: { balance } }));
-        });
+        provider.on('block', handleBlock);
         //监听用户切换的事件
         window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
             console.log('metamask 用户变化，发送事件：', 'wallet-connected');
@@ -48,7 +54,13 @@ const connectMetamask = async (): Promise<any> => {
         return {
             accounts, singer, chainId, address, balance,
             // 标准断开方法（清理所有监听）
-            disconnect: async () => provider.removeAllListeners(),
+            disconnect: async () => {
+                // 1. 清理 Ethers provider 的监听（包括 block）
+                provider.removeAllListeners();
+                // 2. 清理 MetaMask 的监听（包括 accountsChanged 和 chainChanged）
+                window.ethereum.removeListener('accountsChanged');
+                window.ethereum.removeListener('chainChanged');
+            },
         };
     } catch (error) {
         throw new Error('Failed to connect to MetaMask');

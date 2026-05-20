@@ -35,6 +35,18 @@ export const okxConnector = async (): Promise<any> => {
         const balance = await provider.getBalance(address);
         const { chainId } = await provider.getNetwork();
 
+        let lastBalance = balance;
+        // 余额变化处理
+        const handleBlock = async () => {
+            const newBalance = await provider.getBalance(address);
+            if (lastBalance !== newBalance) {
+                lastBalance = newBalance;
+                console.log('okx wallet 区块变化，重新获取余额发送事件：', 'wallet-balance-changed', "balance:", newBalance);
+                window.dispatchEvent(new CustomEvent('wallet-balance-changed', { detail: { balance: newBalance } }));
+            }
+        };
+        provider.on('block', handleBlock);
+
         // 3. 监听用户切换的事件
         okxProvider.on("accountsChanged", (newAccounts: string[]) => {
             window.dispatchEvent(
@@ -73,10 +85,11 @@ export const okxConnector = async (): Promise<any> => {
             balance,
             // 标准断开方法（清理所有监听）
             disconnect: async () => {
-                try {
-                    okxProvider.removeAllListeners();
-                    provider.removeAllListeners();
-                } catch { }
+               // 1. 清理 Ethers provider 的监听（包括 block）
+                provider.removeAllListeners();
+                // 2. 清理 MetaMask 的监听（包括 accountsChanged 和 chainChanged）
+                window.ethereum.removeListener('accountsChanged');
+                window.ethereum.removeListener('chainChanged');
             },
         };
     } catch (error) {

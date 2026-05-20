@@ -55,14 +55,14 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         const { chainId } = customEvent.detail;
         const netID = Number(chainId);
         const netName = chainIDNameDict[netID] || 'Unknown Network';
-        
+
         // 更新网络信息
         setState(prevState => ({
             ...prevState,
             chaindID: chainId,
             netName: netName,
         }));
-        
+
         // 如果已连接钱包，刷新余额（因为不同网络的余额不同）
         if (state.isConnected && state.address && state.provider) {
             state.provider.getBalance(state.address).then((newBalance: any) => {
@@ -74,7 +74,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
                 console.error('Failed to refresh balance after chain change:', error);
             });
         }
-        
+
         console.log('Network switched to:', netName, 'Chain ID:', chainId);
     };
 
@@ -112,6 +112,10 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
             balance: balance as string,
         }));
     };
+
+    //缓存连接器对象
+    const [connector, setConnector] = useState<any>(null);
+
     const connect = async (walletId: string) => {
         console.log('开始连接钱包:>>>>', walletId);
         //触发用户在列表选择的钱包类型回调
@@ -125,6 +129,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
             currentConnectwalletID: walletId,
         }));
         wallet.connector().then((res) => {
+            setConnector(res);
             const { accounts, singer, chainId, address, balance } = res;
             //打印钱包实际回传的参数对象
             console.log('---------------打印钱包实际回传的参数对象------start----------');
@@ -161,6 +166,11 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
     };
 
     const disconnect = async () => {
+        // 调用连接器的 disconnect 清理监听器
+        if (connector?.disconnect) {
+            connector.disconnect();
+            setConnector(null);
+        }
         setState(prevState => ({
             ...prevState,
             address: '',
@@ -196,12 +206,12 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         window.addEventListener('wallet_chain_changed', handleChainChanged);
         window.addEventListener('wallet-connected', handleWalletConnected);
         window.addEventListener('wallet-disconnected', handleWalletDisconnected);
-        window.addEventListener('wallet-balance-changed',handleBalanceChanged);
+        window.addEventListener('wallet-balance-changed', handleBalanceChanged);
         return () => {
             window.removeEventListener('wallet_chain_changed', handleChainChanged);
             window.removeEventListener('wallet-connected', handleWalletConnected);
             window.removeEventListener('wallet-disconnected', handleWalletDisconnected);
-            window.removeEventListener('wallet-balance-changed',handleBalanceChanged);
+            window.removeEventListener('wallet-balance-changed', handleBalanceChanged);
         };
     }, [state.isConnected, state.address, state.provider]);
 

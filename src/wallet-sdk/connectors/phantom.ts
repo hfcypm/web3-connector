@@ -28,6 +28,19 @@ export const phantomConnector = async (): Promise<any> => {
         const balance = await provider.getBalance(address);
         const { chainId } = await provider.getNetwork();
 
+        //初始化余额
+        let lastBalance = balance;
+        // 余额变化处理
+        const handleBlock = async () => {
+            const newBalance = await provider.getBalance(address);
+            if (lastBalance !== newBalance) {
+                lastBalance = newBalance;
+                console.log('phantom wallet 区块变化，重新获取余额发送事件：', 'wallet-balance-changed', "balance:", newBalance);
+                window.dispatchEvent(new CustomEvent('wallet-balance-changed', { detail: { balance: newBalance } }));
+            }
+        };
+        provider.on('block', handleBlock);
+
         // 事件监听应该绑定到原始的钱包扩展实例
         phantomExtension.on("accountsChanged", (newAccounts: string[]) => {
             window.dispatchEvent(
@@ -57,12 +70,11 @@ export const phantomConnector = async (): Promise<any> => {
             provider,
             balance,
             disconnect: async () => {
-                try {
-                    // 清理原始扩展实例的监听器
-                    phantomExtension.removeAllListeners?.();
-                    // 清理provider的监听器
-                    provider.removeAllListeners?.();
-                } catch { }
+                // 1. 清理 Ethers provider 的监听（包括 block）
+                provider.removeAllListeners();
+                // 2. 清理 MetaMask 的监听（包括 accountsChanged 和 chainChanged）
+                window.ethereum.removeListener('accountsChanged');
+                window.ethereum.removeListener('chainChanged');
             },
         };
     } catch (error) {

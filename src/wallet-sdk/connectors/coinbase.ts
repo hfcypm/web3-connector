@@ -24,6 +24,19 @@ export const coinbaseConnector = async (): Promise<any> => {
         const balance = await provider.getBalance(address);
         const { chainId } = await provider.getNetwork();
 
+        //初始化余额
+        let lastBalance = balance;
+        // 余额变化处理
+        const handleBlock = async () => {
+            const newBalance = await provider.getBalance(address);
+            if (lastBalance !== newBalance) {
+                lastBalance = newBalance;
+                console.log('coinbase 区块变化，重新获取余额发送事件：', 'wallet-balance-changed', "balance:", newBalance);
+                window.dispatchEvent(new CustomEvent('wallet-balance-changed', { detail: { balance: newBalance } }));
+            }
+        };
+        provider.on('block', handleBlock);
+
         //监听用户切换的事件
         coinbaseWalletExtension.on('accountsChanged', (newAccounts: string[]) => {
             window.dispatchEvent(new CustomEvent('wallet_accounts_changed', { detail: { newAccounts } }));
@@ -51,7 +64,13 @@ export const coinbaseConnector = async (): Promise<any> => {
             chainId,
             provider,
             balance,
-            disconnect: async () => provider.removeAllListeners()
+            disconnect: async () => {
+                // 1. 清理 Ethers provider 的监听（包括 block）
+                provider.removeAllListeners();
+                // 2. 清理 Coinbase Wallet 的监听（包括 accountsChanged 和 chainChanged）
+                window.ethereum.removeListener('accountsChanged');
+                window.ethereum.removeListener('chainChanged');
+            }
         };
     } catch (error) {
         console.error('Failed to connect to Coinbase Wallet:', error);
