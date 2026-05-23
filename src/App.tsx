@@ -20,7 +20,7 @@ function App() {
         provider={provider}
         wallets={showWallets}
         autoConnect={true}>
-        <div className='flex flex-1'>
+        <div className='flex'>
           <ConnectionButton />
         </div>
       </WalletProvider>

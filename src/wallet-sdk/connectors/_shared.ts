@@ -50,6 +50,7 @@ export async function setupWalletConnection(
     rawProvider: any,
     walletName: string,
 ): Promise<ConnectionResult> {
+    console.log(`[${walletName}] setupWalletConnection 开始连接`);
     // 用 rawProvider 构造 ethers BrowserProvider，后续所有 RPC 调用都走这里
     let provider = new ethers.BrowserProvider(rawProvider);
 
@@ -59,9 +60,11 @@ export async function setupWalletConnection(
     // 获取 Signer（包含私钥签名能力的对象）及其地址
     const signer = await provider.getSigner();
     const address = await signer.getAddress();
+    console.log(`[${walletName}] setupWalletConnection 连接成功，地址: ${address}`);
 
     // 查询连接时的初始余额（单位：wei，bigint）
     const initialBalance = await provider.getBalance(address);
+    console.log(`[${walletName}] setupWalletConnection 初始余额: ${initialBalance}`);
 
     // 获取当前链 ID
     const { chainId } = await provider.getNetwork();
@@ -82,6 +85,7 @@ export async function setupWalletConnection(
         if (disposed) return; // 已断开，忽略
         try {
             const next = await provider.getBalance(address);
+            console.log(`[${walletName}] refreshBalance: ${next}`);
             if (next !== lastBalance) {
                 lastBalance = next;
                 // 派发全局自定义事件，WalletProvider 监听后更新 React state
@@ -198,7 +202,6 @@ export async function setupWalletConnection(
         rawProvider.removeListener?.("disconnect", handleDisconnect);
         provider.removeAllListeners();
     };
-
     return {
         accounts,
         signer,
