@@ -4,7 +4,7 @@ import { isOkxWalletInstalled } from "../utils/index"
 import { toast } from "react-toastify";
 
 // 连接超时时间（毫秒），超时后抛出错误避免无限等待
-const CONNECT_TIMEOUT_MS = 20_000;
+const CONNECT_TIMEOUT_MS = 15_000;
 
 /**
  * OKX 连接器：
@@ -18,6 +18,7 @@ export const okxConnector = async () => {
         toast.error("OKX Wallet is not installed.");
         throw new Error("OKX Wallet is not installed");
     }
+    let timer: any = null;
     try {
         const win = window as any;
         const ethereum = win.ethereum;
@@ -30,7 +31,7 @@ export const okxConnector = async () => {
 
         // 加连接超时，避免 eth_requestAccounts 不响应导致无限等待
         const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(
+            timer = setTimeout(
                 () => {
                     {
                         // 连接超时，提示用户检查钱包扩展
@@ -41,12 +42,14 @@ export const okxConnector = async () => {
                 CONNECT_TIMEOUT_MS,
             ),
         );
-
         const connectionPromise = setupWalletConnection(rawProvider, "okx");
         return await Promise.race([connectionPromise, timeoutPromise]);
     } catch (error) {
         console.error("Failed to connect to OKX Wallet:", error);
         throw error;
+    } finally {
+        //确保连接完成后清除定时器，避免成功后误报超时
+        clearTimeout(timer);
     }
 };
 
