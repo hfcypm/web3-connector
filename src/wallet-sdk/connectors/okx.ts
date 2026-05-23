@@ -33,11 +33,9 @@ export const okxConnector = async () => {
         const timeoutPromise = new Promise<never>((_, reject) =>
             timer = setTimeout(
                 () => {
-                    {
-                        // 连接超时，提示用户检查钱包扩展
-                        toast.error("OKX Wallet connection timed out.");
-                        reject(new Error("OKX Wallet connection timed out. Please check the wallet extension and try again."));
-                    }
+                    // 连接超时，提示用户检查钱包扩展
+                    toast.error("OKX Wallet connection timed out.");
+                    reject(new Error("OKX Wallet connection timed out. Please check the wallet extension and try again."));
                 },
                 CONNECT_TIMEOUT_MS,
             ),

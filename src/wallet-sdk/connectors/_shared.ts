@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { toast } from "react-toastify";
 
 // ─── 全局钱包事件名称常量 ───────────────────────────────────────────────────────
 // 所有 connector 统一通过 window.dispatchEvent 派发这些自定义事件，
@@ -94,6 +95,7 @@ export async function setupWalletConnection(
                         detail: { balance: next },
                     }),
                 );
+                toast.success("Balance updated successfully.");
             }
         } catch (err) {
             // 网络抖动等临时错误不应中断轮询，仅打印警告
