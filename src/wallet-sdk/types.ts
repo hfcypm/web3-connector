@@ -17,6 +17,8 @@ export interface WalletState {
     address: string | null;
     //当前连接钱包ID
     currentConnectwalletID: string;
+    //当前连接的钱包名称
+    currentConnectwalletName: string;
     //是否正在连接
     isConnecting: boolean;
     // 是否连接

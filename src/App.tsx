@@ -22,10 +22,10 @@ function App() {
         wallets={showWallets}
         autoConnect={true}>
         <div className='flex'>
-          <ConnectionButton />
+          <ConnectionButton showWalletName={true} />
         </div>
         {/* 添加 Toast 容器，position 控制弹出位置，autoClose 控制自动关闭时间 */}
-        <ToastContainer position="top-center" autoClose={3000} theme="colored" />
+        <ToastContainer position="top-center" autoClose={1500} theme="colored" />
       </WalletProvider>
     </>
   )

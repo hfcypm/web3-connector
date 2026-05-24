@@ -11,6 +11,7 @@ const WalletContext = createContext<WalletContextValue>({
     isConnecting: false,
     isConnected: false,
     currentConnectwalletID: '',
+    currentConnectwalletName: '',
     address: '',
     chaindID: 0,
     swichChain: async () => { },
@@ -30,6 +31,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
     const [state, setState] = useState<WalletState>({
         address: '',
         currentConnectwalletID: '',
+        currentConnectwalletName: '',
         netName: '',
         isConnecting: false,
         isConnected: false,
@@ -93,6 +95,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
             ...prev,
             isConnecting: true,
             currentConnectwalletID: walletId,
+            currentConnectwalletName: wallet.name,
             error: null,
         }));
 

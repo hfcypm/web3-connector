@@ -8,6 +8,7 @@ interface ConnectionButtonProps {
     showBanlance?: boolean;
     size?: "sm" | "md" | "lg";
     className?: string;
+    showWalletName?: boolean;
     //hook 事件
     onConnection?: () => void;
     onDisConnection?: () => void;
@@ -21,11 +22,12 @@ export default function ConnectionButton({
     showBanlance = false,
     size = 'md',
     className = '',
+    showWalletName = false,
 }: ConnectionButtonProps) {
     //自定义的钱包一些配置
     const { disconnect, isConnected, address
         , chaindID, ensName, error, openModal, closeModal
-        , netName, balance } = useWallet();
+        , netName, balance, currentConnectwalletName } = useWallet();
     const sizeClass = {
         sm: 'text-sm px-3 py-1.5',
         md: 'text-md px-4 py-2',
@@ -49,6 +51,11 @@ export default function ConnectionButton({
             <>
                 <div className='flex flex-col'>
                     <div className='flex h-10 mb-5 flex-row justify-items-center items-center'>
+
+                        {/* 钱包名称 */}
+                        {<div className='flex h-10 items-center justify-center border border-gray-300
+                         rounded-lg p-2 hover:bg-gray-400 mr-2'>{currentConnectwalletName}</div>}
+
                         {/* 地址 */}
                         <div className='flex h-10 items-center justify-center border border-gray-300 rounded-lg p-2'>
                             <Globe className='w-6 h-6 text-gray-500'></Globe>
