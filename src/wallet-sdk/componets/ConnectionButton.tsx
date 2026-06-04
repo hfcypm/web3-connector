@@ -26,8 +26,9 @@ export default function ConnectionButton({
 }: ConnectionButtonProps) {
     //自定义的钱包一些配置
     const { disconnect, isConnected, address
-        , chaindID, ensName, error, openModal, closeModal
+        , chaindID, ensName, error, openModal
         , netName, balance, currentConnectwalletName } = useWallet();
+
     const sizeClass = {
         sm: 'text-sm px-3 py-1.5',
         md: 'text-md px-4 py-2',

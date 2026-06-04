@@ -16,7 +16,7 @@ const WalletContext = createContext<WalletContextValue>({
     chaindID: 0,
     swichChain: async () => { },
     openModal: function (): void { },
-    closeModal: function (): void { },
+    // closeModal: function (): void { },
     refreshBalance: async () => { },
     ensName: null,
     error: null,
@@ -211,7 +211,6 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         disconnect,
         swichChain,
         openModal,
-        closeModal,
         refreshBalance,
     };
 
