@@ -1,0 +1,41 @@
+# 1.工作流名称
+name: Deploy
+
+# 2.触发条件
+on:
+  push:
+    branches:
+      - master
+
+# 3.任务
+jobs:
+  build:
+    # 运行环境
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Depoly to Server via scp
+        run: |
+          # 设置SSH密钥对
+          mkdir -p ~/.ssh
+          echo "${{secrets.SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          # 添加服务器至known_hosts 避免首次连接提示
+          ssh-keyscan -H ${{secrets.SERVER_HOST}} >> ~/.ssh/known_hosts 
+
+          # 使用 scp 上传dist 文件到服务器
+          scp -r dist/* ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}}:/www/wwwroot/web-connector
