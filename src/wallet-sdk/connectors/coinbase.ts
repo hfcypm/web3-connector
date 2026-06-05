@@ -1,5 +1,5 @@
 import type { Wallet } from "../types";
-import { setupWalletConnection } from "./_shared";
+import { handleWalletConnection } from "./_shared";
 
 /**
  * 检测 Coinbase Wallet 是否安装
@@ -48,7 +48,7 @@ export const coinbaseConnector = async () => {
     }
     try {
         const rawProvider = getCoinbaseProvider();
-        return await setupWalletConnection(rawProvider, "coinbase");
+        return await handleWalletConnection(rawProvider, "coinbase");
     } catch (error) {
         console.error("Failed to connect to Coinbase Wallet:", error);
         throw error;

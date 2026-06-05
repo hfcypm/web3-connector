@@ -47,11 +47,11 @@ export interface ConnectionResult {
  * @param rawProvider  EIP-1193 provider 对象
  * @param walletName   钱包名称，仅用于 console 日志前缀
  */
-export async function setupWalletConnection(
+export async function handleWalletConnection(
     rawProvider: any,
     walletName: string,
 ): Promise<ConnectionResult> {
-    console.log(`[${walletName}] setupWalletConnection 开始连接`);
+    console.log(`[${walletName}] --------开始连接-----------`);
     // 用 rawProvider 构造 ethers BrowserProvider，后续所有 RPC 调用都走这里
     let provider = new ethers.BrowserProvider(rawProvider);
 
@@ -61,11 +61,11 @@ export async function setupWalletConnection(
     // 获取 Signer（包含私钥签名能力的对象）及其地址
     const signer = await provider.getSigner();
     const address = await signer.getAddress();
-    console.log(`[${walletName}] setupWalletConnection 连接成功，地址: ${address}`);
+    console.log(`[${walletName}] --------连接成功-----------，地址: ${address}`);
 
     // 查询连接时的初始余额（单位：wei，bigint）
     const initialBalance = await provider.getBalance(address);
-    console.log(`[${walletName}] setupWalletConnection 初始余额: ${initialBalance}`);
+    console.log(`[${walletName}] --------获取初始余额-----------: ${initialBalance}`);
 
     // 获取当前链 ID
     const { chainId } = await provider.getNetwork();

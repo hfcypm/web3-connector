@@ -1,5 +1,6 @@
 import type { Wallet } from "../types";
-import { setupWalletConnection } from "./_shared";
+import { handleWalletConnection } from "./_shared";
+import { isMetaMaskInstalled } from "../utils";
 
 /**
  * MetaMask 连接器：
@@ -7,11 +8,11 @@ import { setupWalletConnection } from "./_shared";
  * 真正的连接 / 监听 / 余额轮询逻辑在 _shared.setupWalletConnection 中。
  */
 const connectMetamask = async () => {
-    if (!window.ethereum) {
+    if (!isMetaMaskInstalled()) {
         throw new Error("MetaMask is not installed");
     }
     try {
-        return await setupWalletConnection(window.ethereum, "metamask");
+        return await handleWalletConnection(window.ethereum, "metamask");
     } catch (error) {
         console.error("Failed to connect to MetaMask:", error);
         // 统一抛出 Error 实例，方便上层 catch 后读取 message

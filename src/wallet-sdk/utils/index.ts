@@ -2,16 +2,23 @@ import { ethers } from "ethers";
 
 /**
  * 检测 OKX 钱包是否安装
- * OKX provider 注入位置有两种：
+ * OKX provider 注入位置有三种：
  *  1. window.okxwallet —— OKX 独立命名空间（即使 window.ethereum 被其他钱包占用也能拿到）
  *  2. window.ethereum.isOkxWallet —— 作为默认钱包时挂到 window.ethereum
+ *  3. window.ethereum.providers[] —— 多钱包共存时（EIP-5749 兼容数组），查找其中的 OKX provider
  */
 export const isOkxWalletInstalled = (): boolean => {
     if (typeof window === "undefined") return false;
     const win = window as any;
     const ethereum = win.ethereum;
     const okxWallet = win.okxwallet;
-    return !!okxWallet || (!!ethereum && ethereum.isOkxWallet === true);
+    if (!!okxWallet) return true;
+    if (!!ethereum && ethereum.isOkxWallet === true) return true;
+    // 多钱包共存时，window.ethereum 会暴露 providers 数组
+    if (ethereum && Array.isArray(ethereum.providers)) {
+        return ethereum.providers.some((p: any) => p?.isOkxWallet);
+    }
+    return false;
 }
 
 /**
