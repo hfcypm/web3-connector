@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
+import { getBalanceFast } from "./okx_balance";
 
 // ─── 全局钱包事件名称常量 ───────────────────────────────────────────────────────
 // 所有 connector 统一通过 window.dispatchEvent 派发这些自定义事件，
@@ -57,16 +58,34 @@ export async function handleWalletConnection(
 
     // 弹出授权弹窗，用户同意后返回授权地址列表
     const accounts: string[] = await provider.send("eth_requestAccounts", []);
+    console.log("accounts", await rawProvider.request({ method: "eth_accounts" }));
 
     // 获取 Signer（包含私钥签名能力的对象）及其地址
     const signer = await provider.getSigner();
     const address = await signer.getAddress();
-    console.log(`[${walletName}] --------连接成功-----------，地址: ${address}`);
+    console.log(`[${walletName}] --------连接成功-------address: ${address}`);
 
-    // 查询连接时的初始余额（单位：wei，bigint）
-    const initialBalance = await provider.getBalance(address);
+    // 单独处理 OKX 钱包的特殊余额查询逻辑
+    let initialBalance = 0n;
+    const isOkxWallet = rawProvider.isOKExWallet;
+    console.log(`[${walletName}] --------是否OKX钱包-----------: ${isOkxWallet}`);
+
+    if (isOkxWallet) {
+        console.log(`[${walletName}] --------开始查询okx初始余额-----------`);
+        // OKX：原生RPC查询（必准）okx不能通过getbalance获取余额，只能通过eth_getBalance获取
+        // OKX返回hex字符串："0x..."
+        // const balanceHex: string = await rawProvider.request({
+        //     method: "eth_getBalance",
+        //     params: [address, "latest"],
+        // });
+        // // 关键：hex字符串转bigint
+        // initialBalance = BigInt(balanceHex);
+        initialBalance = await getBalanceFast(rawProvider, address);
+        console.log(`[${walletName}] --------结束okx初始余额查询-----------，余额: ${initialBalance}`);
+    } else {
+        initialBalance = await provider.getBalance(address);
+    }
     console.log(`[${walletName}] --------获取初始余额-----------: ${initialBalance}`);
-
     // 获取当前链 ID
     const { chainId } = await provider.getNetwork();
 
@@ -85,7 +104,12 @@ export async function handleWalletConnection(
     const refreshBalance = async () => {
         if (disposed) return; // 已断开，忽略
         try {
-            const next = await provider.getBalance(address);
+            let next: bigint;
+            if (isOkxWallet) {
+                next = await getBalanceFast(rawProvider, address);
+            } else {
+                next = await provider.getBalance(address);
+            }
             console.log(`[${walletName}] refreshBalance: ${next}`);
             if (next !== lastBalance) {
                 lastBalance = next;
@@ -157,8 +181,13 @@ export async function handleWalletConnection(
      */
     const handleChainChanged = (newChainIdHex: string) => {
         const newChainId = Number.parseInt(newChainIdHex, 16);
+        lastBalance = -1n;
+        // ✅ 只有非 OKX 钱包才重建 provider
+        if (!isOkxWallet) {
+            provider = new ethers.BrowserProvider(rawProvider);
+        }
         // 切链后旧 provider 绑定的是旧网络，必须重建
-        provider = new ethers.BrowserProvider(rawProvider);
+        //provider = new ethers.BrowserProvider(rawProvider);
         // 重置基线，下一次拉取一定会派发余额事件
         lastBalance = -1n;
         window.dispatchEvent(

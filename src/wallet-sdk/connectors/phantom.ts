@@ -1,5 +1,5 @@
 import type { Wallet } from "../types";
-import { handleWalletConnection } from "./_shared";
+import { handleWalletConnection } from "./_sharedwallet";
 import { toast } from "react-toastify";
 
 // 连接超时时间（毫秒），超时后抛出错误避免无限等待

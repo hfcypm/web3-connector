@@ -1,5 +1,5 @@
 import type { Wallet } from "../types";
-import { handleWalletConnection } from "./_shared";
+import { handleWalletConnection } from "./_sharedwallet";
 
 /**
  * 检测 Coinbase Wallet 是否安装

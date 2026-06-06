@@ -1,5 +1,5 @@
 import type { Wallet } from "../types";
-import { handleWalletConnection } from "./_shared";
+import { handleWalletConnection } from "./_sharedwallet";
 import { isMetaMaskInstalled } from "../utils";
 import { CONNECTION_TIMEOUT_MS } from "../const/connection";
 
@@ -15,14 +15,15 @@ const connectMetamask = async () => {
 
     let timer: ReturnType<typeof setTimeout> | null = null;
     try {
+        // provider
+        const provider = window.ethereum;
         // 加连接超时，避免 eth_requestAccounts 不响应导致无限等待
         const timeoutPromise = new Promise((_, reject) => {
             timer = setTimeout(() => {
                 reject(new Error("MetaMask connection timeout"));
             }, CONNECTION_TIMEOUT_MS);
         });
-        return Promise.race([timeoutPromise, handleWalletConnection(window.ethereum
-            , "metamask")]);
+        return Promise.race([timeoutPromise, handleWalletConnection(provider, "metamask")]);
     } catch (error) {
         console.error("Failed to connect to MetaMask:", error);
         // 统一抛出 Error 实例，方便上层 catch 后读取 message

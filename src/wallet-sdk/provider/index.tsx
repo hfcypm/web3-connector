@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useContext, useMemo, useRef,
 import type { Wallet, WalletContextValue, WalletProviderProps, WalletState } from "../types";
 import { WalletModal } from "../componets/WalletModal";
 import { chainIDNameDict } from "../const/network";
-import { WALLET_EVENTS, type ConnectionResult } from "../connectors/_shared";
+import { WALLET_EVENTS, type ConnectionResult } from "../connectors/_sharedwallet";
 
 
 const WalletContext = createContext<WalletContextValue>({
