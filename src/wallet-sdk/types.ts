@@ -46,6 +46,8 @@ export interface WalletContextValue extends WalletState {
     openModal: () => void;
     //业务方可在交易确认后手动调用，立刻刷新余额
     refreshBalance: () => Promise<void>;
+    //发送交易转账
+    sendTransaction: (transaction: any) => Promise<any>;
 }
 
 export interface WalletProviderProps {

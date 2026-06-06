@@ -33,6 +33,8 @@ export interface ConnectionResult {
     refreshBalance: () => Promise<void>;
     /** 断开连接并清理所有事件监听、轮询计时器 */
     disconnect: () => Promise<void>;
+    /** 发起转账交易 */
+    sendTransaction: (tx: ethers.TransactionRequest) => Promise<ethers.TransactionReceipt | null>;
 }
 
 /**
@@ -233,6 +235,25 @@ export async function handleWalletConnection(
         rawProvider.removeListener?.("disconnect", handleDisconnect);
         provider.removeAllListeners();
     };
+
+    // 发起转账交易
+    const sendTransaction = async (tx: ethers.TransactionRequest) => {
+        try {
+            // 1. 用 signer 发送交易
+            const transaction = await signer.sendTransaction(tx);
+            console.log("交易发送成功:", transaction.hash);
+            // 2. 等待确认交易
+            const receipt = await transaction.wait();
+            console.log("交易上链成功:", receipt);
+            // 3. 刷新余额
+            await refreshBalance();
+            return receipt;
+        } catch (err) {
+            console.error("交易失败:", err);
+            throw err;
+        }
+    }
+
     return {
         accounts,
         signer,
@@ -242,5 +263,6 @@ export async function handleWalletConnection(
         balance: initialBalance,
         refreshBalance,
         disconnect,
+        sendTransaction,
     };
 }

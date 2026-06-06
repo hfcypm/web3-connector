@@ -1,32 +1,14 @@
-import React, { createContext, useState, useEffect, useContext, useMemo, useRef, useCallback } from "react";
+import React, { useState, useEffect, useContext, useMemo, useRef, useCallback } from "react";
 import type { Wallet, WalletContextValue, WalletProviderProps, WalletState } from "../types";
 import { WalletModal } from "../componets/WalletModal";
 import { chainIDNameDict } from "../const/network";
 import { WALLET_EVENTS, type ConnectionResult } from "../connectors/_sharedwallet";
+import { WalletContext } from "./walletcontext";
 
 
-const WalletContext = createContext<WalletContextValue>({
-    connect: async () => { },
-    disconnect: async () => { },
-    isConnecting: false,
-    isConnected: false,
-    currentConnectwalletID: '',
-    currentConnectwalletName: '',
-    address: '',
-    chaindID: 0,
-    swichChain: async () => { },
-    openModal: function (): void { },
-    // closeModal: function (): void { },
-    refreshBalance: async () => { },
-    ensName: null,
-    error: null,
-    chains: [],
-    provider: undefined,
-    netName: '',
-    balance: ''
-});
-
-
+/**
+ * 钱包全局 provider
+ */
 export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains, provider, autoConnect, wallets }) => {
     const [state, setState] = useState<WalletState>({
         address: '',
@@ -47,6 +29,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
     // 用 ref 持有当前连接器，避免重连时旧监听泄漏，并让全局事件处理器读到最新值
     const connectorRef = useRef<ConnectionResult | null>(null);
 
+    // 钱包字典 - 用于快速查找钱包
     const wallletDict = useMemo(() => {
         return wallets.reduce((acc, wallet) => {
             acc[wallet.id] = wallet;
@@ -57,9 +40,14 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
     const closeModal = useCallback(() => setModalOpen(false), []);
     const openModal = useCallback(() => setModalOpen(true), []);
 
-    // 业务方可调用，例如发送完一笔交易后立即刷新
+    // 业务-立即刷新
     const refreshBalance = useCallback(async () => {
         await connectorRef.current?.refreshBalance();
+    }, []);
+
+    // 业务-发送交易转账
+    const sendTransaction = useCallback(async (transaction: any) => {
+        return await connectorRef.current?.sendTransaction(transaction);
     }, []);
 
     const disconnect = useCallback(async () => {
@@ -212,6 +200,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         swichChain,
         openModal,
         refreshBalance,
+        sendTransaction,
     };
 
     return (

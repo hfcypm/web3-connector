@@ -5,6 +5,7 @@ import { supportChainsConfigs } from './wallet-sdk/const/chain'
 import { showWallets } from './wallet-sdk/const/wallets'
 import './App.css'
 import { ToastContainer } from 'react-toastify'
+import TransferButton from './wallet-sdk/componets/TransferButton'
 
 function App() {
   //window.ethereum：是 MetaMask 等钱包注入的原始对象，属于底层 API。
@@ -21,8 +22,12 @@ function App() {
         provider={provider}
         wallets={showWallets}
         autoConnect={true}>
+
         <div className='flex'>
-          <ConnectionButton showWalletName={true} />
+          <div className='flex flex-col items-center justify-center margin-auto'>
+            <ConnectionButton showWalletName={true} />
+            <TransferButton />
+          </div>
         </div>
         {/* 添加 Toast 容器，position 控制弹出位置，autoClose 控制自动关闭时间 */}
         <ToastContainer position="top-center" autoClose={1500} theme="colored" />
