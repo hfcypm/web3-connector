@@ -2,9 +2,7 @@ import type { Wallet } from "../types";
 import { handleWalletConnection } from "./_shared";
 import { isOkxWalletInstalled } from "../utils/index"
 import { toast } from "react-toastify";
-
-// 连接超时时间（毫秒），超时后抛出错误避免无限等待
-const CONNECT_TIMEOUT_MS = 15_000;
+import { CONNECTION_TIMEOUT_MS } from "../const/connection";
 
 /**
  * OKX 连接器：
@@ -73,7 +71,7 @@ export const okxConnector = async () => {
                         "OKX Wallet connection timed out. Please check the wallet extension and try again."
                     ));
                 },
-                CONNECT_TIMEOUT_MS,
+                CONNECTION_TIMEOUT_MS,
             );
         });
 
