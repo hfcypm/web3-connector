@@ -1,7 +1,6 @@
 import { useWallet } from '../provider'
 import { Globe, Power } from 'lucide-react';
-import { formatEther, ethers } from 'ethers';
-import TransferButton from './TransferButton';
+import { formatEther } from 'ethers';
 
 
 //自定义当前连接属性
@@ -27,9 +26,8 @@ export default function ConnectionButton({
     showWalletName = false,
 }: ConnectionButtonProps) {
     //自定义的钱包一些配置
-    const { disconnect, isConnected, address
-        , chaindID, ensName, error, openModal
-        , netName, balance, currentConnectwalletName, sendTransaction } = useWallet();
+    const { disconnect, isConnected, address, openModal
+        , netName, balance, currentConnectwalletName } = useWallet();
 
     const sizeClass = {
         sm: 'text-sm px-3 py-1.5',

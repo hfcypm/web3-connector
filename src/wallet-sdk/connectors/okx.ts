@@ -69,7 +69,7 @@ export const getOkxEip1193Provider = () => {
     // 方案1：优先OKX专属全局对象 window.okxwallet（官方标准注入）
     if (window.okxwallet && typeof window.okxwallet.request === "function") {
         return window.okxwallet;
-    }
+    }   
 
     // 方案2：多钱包场景从 window.ethereum.providers 筛选OKX（_isOkxWallet 下划线！）
     if (!window.ethereum) throw new Error("未安装任何EVM钱包");
