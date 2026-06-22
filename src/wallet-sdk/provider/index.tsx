@@ -3,7 +3,7 @@ import type { Wallet, WalletContextValue, WalletProviderProps, WalletState } fro
 import { WalletModal } from "../componets/WalletModal";
 import { chainIDNameDict } from "../const/network";
 import { WALLET_EVENTS, type ConnectionResult } from "../connectors/_sharedwallet";
-import { WalletContext } from "./walletcontext";
+import { WalletContext } from "./WalletContext";
 
 
 /**

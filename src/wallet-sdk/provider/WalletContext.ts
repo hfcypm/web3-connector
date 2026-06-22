@@ -24,4 +24,5 @@ export const WalletContext = createContext<WalletContextValue>({
     netName: '',
     balance: '',
     sendTransaction: async () => { },
+    watchTransaction: async (tx: string, confirmations: number) => { return null; },
 });
