@@ -47,7 +47,14 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
 
     // 业务-发送交易转账
     const sendTransaction = useCallback(async (transaction: any) => {
-        return await connectorRef.current?.sendTransaction(transaction);
+        if (!connectorRef.current) return null;
+        return await connectorRef.current.sendTransaction(transaction);
+    }, []);
+
+    // 链上交易监听事件
+    const watchTransaction = useCallback(async (tx: string, confirmations: number) => {
+        if (!connectorRef.current) return null;
+        return await connectorRef.current.watchTransaction(tx, confirmations);
     }, []);
 
     const disconnect = useCallback(async () => {
@@ -201,6 +208,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         openModal,
         refreshBalance,
         sendTransaction,
+        watchTransaction,
     };
 
     return (

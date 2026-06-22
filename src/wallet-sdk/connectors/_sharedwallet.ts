@@ -35,6 +35,11 @@ export interface ConnectionResult {
     disconnect: () => Promise<void>;
     /** 发起转账交易 */
     sendTransaction: (tx: ethers.TransactionRequest) => Promise<ethers.TransactionReceipt | null>;
+    /** 
+     * 交易监听事件(适用于 ERC-20 转账、合约调用等  消耗 gas)
+     * 确认后自动刷新原生币余额。
+     */
+    watchTransaction: (txHash: string, confirmations?: number) => Promise<ethers.TransactionReceipt | null>;
 }
 
 /**
@@ -220,6 +225,24 @@ export async function handleWalletConnection(
     if (!document.hidden) startPolling();
 
     /**
+     * 监听一笔交易上链，确认后自动刷新原生币余额。
+     * 业务方发送 ERC-20 转账或合约调用后，传入 txHash 即可，
+     * SDK 等待 transaction receipt 返回后自动触发 refreshBalance。
+     */
+    const watchTransaction = async (tx: string, confirmations?: number): Promise<ethers.TransactionReceipt | null> => {
+        try {
+            const receipt = await provider.waitForTransaction(tx, confirmations);
+            if (receipt) {
+                await refreshBalance();
+            }
+            return receipt;
+        } catch (err) {
+            console.error("watchTransaction failed:", err);
+            return null;
+        }
+    }
+
+    /**
      * 断开连接并清理所有副作用：
      * - 停止轮询计时器
      * - 移除页面可见性监听
@@ -264,5 +287,6 @@ export async function handleWalletConnection(
         refreshBalance,
         disconnect,
         sendTransaction,
+        watchTransaction,
     };
 }

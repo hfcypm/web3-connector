@@ -1,3 +1,5 @@
+import type { ethers } from "ethers";
+
 //支持的区块链络类型
 export type Chain = {
     id: number;
@@ -48,6 +50,8 @@ export interface WalletContextValue extends WalletState {
     refreshBalance: () => Promise<void>;
     //发送交易转账
     sendTransaction: (transaction: any) => Promise<any>;
+    //监听一笔交易上链，确认后自动刷新原生币余额。
+    watchTransaction: (tx: string, confirmations: number) => Promise<ethers.TransactionReceipt | null>;
 }
 
 export interface WalletProviderProps {

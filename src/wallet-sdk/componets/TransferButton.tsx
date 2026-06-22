@@ -8,7 +8,7 @@ export default function TransferButton() {
     const [address, setAddress] = useState<string>('');
     const [money, setMoney] = useState<string>('');
     //导入hook
-    const { sendTransaction, isConnected } = useWallet();
+    const { sendTransaction, isConnected, watchTransaction } = useWallet();
     // 发起转账
     const testTransfer = async () => {
         if (!isConnected) {
