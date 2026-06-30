@@ -57,6 +57,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         return await connectorRef.current.watchTransaction(tx, confirmations);
     }, []);
 
+    // 断开
     const disconnect = useCallback(async () => {
         if (connectorRef.current?.disconnect) {
             await connectorRef.current.disconnect();
@@ -74,6 +75,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         }));
     }, []);
 
+    // 连接钱包
     const connect = useCallback(async (walletId: string) => {
         const wallet = wallletDict[walletId];
         if (!wallet) {
@@ -122,6 +124,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         }
     }, [wallletDict, closeModal]);
 
+    // 自定义的UI中 网络下拉切换的处理
     const swichChain = useCallback(async () => {
         // TODO: wallet_switchEthereumChain
     }, []);

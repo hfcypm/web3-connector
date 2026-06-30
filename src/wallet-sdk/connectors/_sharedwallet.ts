@@ -187,6 +187,7 @@ export async function handleWalletConnection(
      * - 将 lastBalance 重置为 -1n，确保下次 refreshBalance 一定会派发 balanceChanged
      */
     const handleChainChanged = (newChainIdHex: string) => {
+        console.log(`[${walletName}] handleChainChanged: ${newChainIdHex}`);
         const newChainId = Number.parseInt(newChainIdHex, 16);
         lastBalance = -1n;
         // ✅ 只有非 OKX 钱包才重建 provider
