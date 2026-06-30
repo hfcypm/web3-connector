@@ -134,6 +134,18 @@ export async function handleWalletConnection(
         }
     };
 
+    // 包装 signer.sendTransaction：等待交易回执确认后自动刷新余额(监听原生及ERC20交易 转账消耗 gas)
+    const origSend = signer.sendTransaction.bind(signer) as typeof signer.sendTransaction;
+    signer.sendTransaction = async (tx: ethers.TransactionRequest) => {
+        const res = await origSend(tx);
+        await res.wait().then(() => {
+            if (!disposed) {
+                refreshBalance();
+            }
+        });
+        return res;
+    }
+
     // 启动定时轮询（幂等：已在轮询时调用无副作用）
     const startPolling = () => {
         if (pollTimer !== null) return;
