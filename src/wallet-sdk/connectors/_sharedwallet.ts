@@ -272,22 +272,13 @@ export async function handleWalletConnection(
         provider.removeAllListeners();
     };
 
-    // 发起转账交易
+    // 发起转账交易（已通过包装 signer.sendTransaction 自动等待确认并刷新余额）
     const sendTransaction = async (tx: ethers.TransactionRequest) => {
-        try {
-            // 1. 用 signer 发送交易
-            const transaction = await signer.sendTransaction(tx);
-            console.log("交易发送成功:", transaction.hash);
-            // 2. 等待确认交易
-            const receipt = await transaction.wait();
-            console.log("交易上链成功:", receipt);
-            // 3. 刷新余额
-            await refreshBalance();
-            return receipt;
-        } catch (err) {
-            console.error("交易失败:", err);
-            throw err;
-        }
+        const transaction = await signer.sendTransaction(tx);
+        console.log("交易发送成功:", transaction.hash);
+        const receipt = await transaction.wait();
+        console.log("交易上链成功:", receipt);
+        return receipt;
     }
 
     return {
