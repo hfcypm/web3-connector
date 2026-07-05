@@ -1,6 +1,7 @@
 import { useWallet } from '../provider'
-import { Globe, Power } from 'lucide-react';
+import { Globe, Power, ChevronDown } from 'lucide-react';
 import { formatEther } from 'ethers';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 
 
 //自定义当前连接属性
@@ -13,7 +14,7 @@ interface ConnectionButtonProps {
     //hook 事件
     onConnection?: () => void;
     onDisConnection?: () => void;
-    onChainChange?: () => void;
+    onChainChange: (fromChainId: number, toChainId: number) => void;
     onBalanceChange?: (balance: string) => void;
     onError?: (error: Error) => void;
 }
@@ -24,10 +25,15 @@ export default function ConnectionButton({
     size = 'md',
     className = '',
     showWalletName = false,
+    onChainChange
 }: ConnectionButtonProps) {
+    //是否展示网络切换下拉菜单
+    const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+
     //自定义的钱包一些配置
     const { disconnect, isConnected, address, openModal
-        , netName, balance, currentConnectwalletName } = useWallet();
+        , netName, balance, currentConnectwalletName
+        , chaindID, switchChain, chains } = useWallet();
 
     const sizeClass = {
         sm: 'text-sm px-3 py-1.5',
@@ -46,6 +52,32 @@ export default function ConnectionButton({
     const balanceEth = formatEther(balance || '0');
     //保留4位小数
     const showBalance = parseFloat(balanceEth).toFixed(4);
+
+    /** ---------change network start--------- */
+    //支持网络的的下拉三角箭头
+    const handleDropEvent = (e: React.MouseEvent) => {
+        e.stopPropagation()
+        setIsDropdownOpen((preDropdownOpen) => !preDropdownOpen)
+    }
+    //网络切换处理(用户点击列表条目)
+    const handleChainChange = useCallback(async (selectChainId: number) => {
+        try {
+            if (selectChainId !== chaindID) {
+                //执行网络切换动作
+                await switchChain(selectChainId)
+                //回调到UI层callback
+                // 触发链切换回调
+                if (selectChainId && onChainChange) {
+                    onChainChange(chaindID, selectChainId);
+                }
+            }
+        } catch (error) {
+            console.log('网络切换异常:', error)
+        }
+        setIsDropdownOpen(false)
+    }, [chaindID, switchChain, onChainChange])
+    /** ---------change network end--------- */
+
     if (isConnected) {
         //已连接状态断开钱包链接
         return (
@@ -58,9 +90,47 @@ export default function ConnectionButton({
                          rounded-lg p-2 hover:bg-gray-400 mr-2'>{currentConnectwalletName}</div>}
 
                         {/* 地址 */}
-                        <div className='flex h-10 items-center justify-center border border-gray-300 rounded-lg p-2'>
-                            <Globe className='w-6 h-6 text-gray-500'></Globe>
-                            <div className='ml-2'>{netName}</div>
+                        <div className='relative'>
+                            <div className='flex h-10 items-center justify-center border border-gray-300 rounded-lg p-2'>
+                                <Globe className='w-6 h-6 text-gray-500'></Globe>
+                                <div className='ml-2'>{netName}</div>
+                                <ChevronDown
+                                    className={`ml-2 text-gray-500 dark:text-gray-400 transform transition-transform duration-300 shrink-0 ${isDropdownOpen ? 'rotate-180' : ''
+                                        }`}
+                                    onClick={(e) => handleDropEvent(e)} />
+                            </div>
+                            {/* 点击展开列表数据 1.下面遮罩层 2.列表数据渲染 */}
+                            {
+                                isDropdownOpen && (
+                                    <>
+                                        {/* 遮罩层 */}
+                                        <div className='fixed z-40 inset-0' onClick={() => setIsDropdownOpen(false)} />
+
+                                        <div className="absolute top-full mt-2 w-48 
+                                            bg-white dark:bg-gray-800 
+                                            rounded-sm shadow-sm
+                                            border  border-gray-200 dark:border-gray-600
+                                            backdrop-blur-lg
+                                            z-50 overflow-hidden">{
+                                                chains.map((chain) =>
+                                                    <button onClick={() => handleChainChange(chain.id)}
+                                                        className={`w-full h-10 text-center  hover:bg-gray-100 
+                                                            ${chain.id === chaindID
+                                                                ? 'font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-300 dark:text-blue-300'
+                                                                : 'text-gray-700 dark:text-gray-200'
+                                                            }`}
+                                                    >
+                                                        <div className='flex items-center justify-center'>
+                                                            <span>{chain.name.split(' ')[0]}</span>
+                                                            {chain.id === chaindID && <div className="w-2.5 h-2.5 ml-2 bg-blue-300 rounded-full shadow-lg" />}
+                                                        </div>
+                                                    </button>
+                                                )
+                                            }
+                                        </div>
+                                    </>
+                                )
+                            }
                         </div>
 
                         <div className='flex flex-row h-10 justify-center items-center ml-4 px-2 border border-gray-300 rounded-md'>
@@ -76,6 +146,7 @@ export default function ConnectionButton({
         );
 
     } else {
+        // 未连接状态 连接钱包
         return (
             <button className={`bg-blue-400 text-white font-bold py-2 px-4 rounded hover:bg-blue-500 ${className} ${sizeClass[size]}`}
                 onClick={openModal}>{label}</button>

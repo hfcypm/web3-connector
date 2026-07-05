@@ -13,7 +13,7 @@ export const WalletContext = createContext<WalletContextValue>({
     currentConnectwalletName: '',
     address: '',
     chaindID: 0,
-    swichChain: async () => { },
+    switchChain: async () => { },
     openModal: function (): void { },
     // closeModal: function (): void { },
     refreshBalance: async () => { },

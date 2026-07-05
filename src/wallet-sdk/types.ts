@@ -2,15 +2,19 @@ import type { ethers } from "ethers";
 
 //支持的区块链络类型
 export type Chain = {
-    id: number;
-    name: string;
-    rpc: string;
-    currency: {
-        name: string;
-        symbol: string;
-        decimals: number;
-        icon: string;
+    id: number; // 链ID，十进制数字（1=ETH主网，56=BSC）
+    name: string; // 网络名称：以太坊、BNB智能链等
+    rpc: string; // RPC节点接口，用来发交易、查链上数据
+    currency: { // 链原生代币配置（MetaMask必填）
+        name: string;    // 代币全称
+        symbol: string;  // 代币简称 ETH/BNB/MATIC
+        decimals: number;// 小数位数，绝大多数公链18
+        icon: string;    // 代币图标地址，前端展示用，钱包添加不使用
     }
+    blockExplorer?: { // 可选 区块浏览器
+        name: string; // 浏览器名称 Etherscan
+        url: string;  // 浏览器地址 https://etherscan.io
+    };
 }
 
 // 钱包的状态
@@ -31,6 +35,7 @@ export interface WalletState {
     ensName: string | null;
     //错误
     error: Error | null;
+    // 支持的切换网络列表
     //连接的链（支持的区块链络类型）
     chains: Chain[];
     //provider
@@ -44,7 +49,7 @@ export interface WalletState {
 export interface WalletContextValue extends WalletState {
     connect: (walletID: string) => Promise<void>;
     disconnect: () => Promise<void>;
-    swichChain: (chainID: string) => Promise<void>;
+    switchChain: (chainID: number) => Promise<void>;
     openModal: () => void;
     //业务方可在交易确认后手动调用，立刻刷新余额
     refreshBalance: () => Promise<void>;

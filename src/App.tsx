@@ -14,6 +14,12 @@ function App() {
   // window.ethereum  ──作为参数──>  new ethers.BrowserProvider()  ──返回──>  provider (ethers 实例)
   //     (底层原始对象)                        (ethers 包装器)                    (高级 provider)
   const provider = new ethers.BrowserProvider(window.ethereum)
+
+  //收到网络切换事件
+  const onChainChangeEvent = (fromChainId: number, toChainId: number) => {
+    console.log(`网络切换: ${fromChainId} → ${toChainId}`);
+  };
+
   return (
     //所有入参均在此配置--->入口
     <>
@@ -25,12 +31,12 @@ function App() {
 
         <div className='flex'>
           <div className='flex flex-col items-center justify-center margin-auto'>
-            <ConnectionButton showWalletName={true} />
+            <ConnectionButton showWalletName={true} onChainChange={onChainChangeEvent} />
             <TransferButton />
           </div>
         </div>
         {/* 添加 Toast 容器，position 控制弹出位置，autoClose 控制自动关闭时间 */}
-        <ToastContainer position="top-center" autoClose={1500} theme="colored" />
+        {/* <ToastContainer position="top-center" autoClose={1500} theme="colored" /> */}
       </WalletProvider>
     </>
   )

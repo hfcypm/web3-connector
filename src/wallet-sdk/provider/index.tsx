@@ -125,8 +125,59 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
     }, [wallletDict, closeModal]);
 
     // 自定义的UI中 网络下拉切换的处理
-    const swichChain = useCallback(async () => {
-        // TODO: wallet_switchEthereumChain
+    const switchChain = useCallback(async (selectChainID: number) => {
+        try {
+            //触发UI层切换网络链事件 执行网络切换
+            //重置当前钱包的错误状态
+            setState(prev => ({ ...prev, error: null }))
+            //检查支持的链路中是否包含当前选择ID
+            const findChain = chains.find((chain) => chain.id === selectChainID)
+            if (!findChain) {
+                //如果没有找到
+                throw new Error(`当前列表不支持的的网络:ID${selectChainID}`);
+            }
+
+            //发起网络切换
+            if (typeof window.ethereum === 'undefined') {
+                throw new Error('No Ethereum provider found');
+            }
+            //网络切换链接
+            //https://docs.metamask.io/metamask-connect/evm/reference/json-rpc-api/wallet_switchEthereumChain/
+            try {
+                //发起切换指定激活的网络
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [
+                        { chainId: `0x${selectChainID.toString(16)}` }
+                    ]
+                })
+            } catch (error: any) {
+                if (error.code === 4092) {
+                    //当前要切换的链，还没添加到用户钱包里
+                    //把当前链路加至钱包中
+                    //https://docs.metamask.io/metamask-connect/evm/reference/json-rpc-api/wallet_addEthereumChain/
+                    window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [
+                            {
+                                chainId: `0x${selectChainID.toString(16)}`,
+                                chainName: findChain.name,
+                                rpcUrls: [findChain.rpc],
+                                nativeCurrency: findChain.currency,
+                                blockExplorerUrls: findChain.blockExplorer
+                                    ? [findChain.blockExplorer.url]
+                                    : undefined,
+                            }
+                        ]
+                    })
+                } else {
+                    throw error
+                }
+            }
+        } catch (error) {
+            console.error('Error switching chain:', error);
+            setState(prev => ({ ...prev, error: error as Error }));
+        }
     }, []);
 
     // 全局事件监听：connector 派发出来的事件 -> 更新 React state
@@ -207,7 +258,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         ...state,
         connect,
         disconnect,
-        swichChain,
+        switchChain,
         openModal,
         refreshBalance,
         sendTransaction,
