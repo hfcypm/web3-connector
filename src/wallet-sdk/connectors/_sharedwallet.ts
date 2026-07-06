@@ -40,6 +40,8 @@ export interface ConnectionResult {
      * 确认后自动刷新原生币余额。
      */
     watchTransaction: (txHash: string, confirmations?: number) => Promise<ethers.TransactionReceipt | null>;
+    /** 用户连接传的入的provider 用于多钱包连接时-网络切换获取当前的provider */
+    rawProvider: any;
 }
 
 /**
@@ -193,6 +195,17 @@ export async function handleWalletConnection(
         refreshBalance();
     };
 
+    //声明需要返回的结果(确保链路类型切换后  provider为最新provider okx)
+    const connectionResult = {
+        accounts,
+        signer,
+        address,
+        chainId,
+        provider,
+        rawProvider,
+        balance: initialBalance,
+        refreshBalance,
+    } as ConnectionResult;
     /**
      * 链切换事件处理（用户在钱包扩展里切换网络）
      * - 重建 provider：切链后旧 provider 绑定的是旧网络的 RPC，必须用新网络重建
@@ -205,6 +218,8 @@ export async function handleWalletConnection(
         //只有非 OKX 钱包才重建 provider
         if (!isOkxWallet) {
             provider = new ethers.BrowserProvider(rawProvider);
+            //改变provider 需要重新赋值 不然网络切换拿的 provider不对
+            connectionResult.provider = provider;
         }
         // 切链后旧 provider 绑定的是旧网络，必须重建
         //provider = new ethers.BrowserProvider(rawProvider);
@@ -281,16 +296,10 @@ export async function handleWalletConnection(
         return receipt;
     }
 
-    return {
-        accounts,
-        signer,
-        address,
-        chainId,
-        provider,
-        balance: initialBalance,
-        refreshBalance,
-        disconnect,
-        sendTransaction,
-        watchTransaction,
-    };
+    // 返回连接结果
+    connectionResult.disconnect = disconnect;
+    connectionResult.sendTransaction = sendTransaction;
+    connectionResult.watchTransaction = watchTransaction;
+
+    return connectionResult;
 }
