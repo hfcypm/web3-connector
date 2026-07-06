@@ -117,8 +117,8 @@ export async function handleWalletConnection(
             } else {
                 next = await provider.getBalance(address);
             }
-            console.log(`[${walletName}] refreshBalance: ${next}`);
             if (next !== lastBalance) {
+                console.log(`[${walletName}] refreshBalance: ${next}`);
                 lastBalance = next;
                 // 派发全局自定义事件，WalletProvider 监听后更新 React state
                 window.dispatchEvent(
@@ -146,13 +146,13 @@ export async function handleWalletConnection(
         return res;
     }
 
-    // 启动定时轮询（幂等：已在轮询时调用无副作用）
+    // 启动定时轮询（已在轮询时调用无副作用）
     const startPolling = () => {
         if (pollTimer !== null) return;
-        pollTimer = window.setInterval(refreshBalance, POLL_INTERVAL_MS);
+        // pollTimer = window.setInterval(refreshBalance, POLL_INTERVAL_MS);
     };
 
-    // 停止定时轮询（幂等）
+    // 停止定时轮询
     const stopPolling = () => {
         if (pollTimer === null) return;
         window.clearInterval(pollTimer);
@@ -202,7 +202,7 @@ export async function handleWalletConnection(
         console.log(`[${walletName}] handleChainChanged: ${newChainIdHex}`);
         const newChainId = Number.parseInt(newChainIdHex, 16);
         lastBalance = -1n;
-        // ✅ 只有非 OKX 钱包才重建 provider
+        //只有非 OKX 钱包才重建 provider
         if (!isOkxWallet) {
             provider = new ethers.BrowserProvider(rawProvider);
         }
