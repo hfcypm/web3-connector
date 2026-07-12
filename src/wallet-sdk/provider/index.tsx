@@ -137,15 +137,16 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
                 throw new Error(`当前列表不支持的的网络:ID${selectChainID}`);
             }
 
-            //发起网络切换
-            if (typeof window.ethereum === 'undefined') {
-                throw new Error('No Ethereum provider found');
+            // 避免多钱包共存时链切换请求发送到错误的钱包(使用传入的)
+            const rawProvider = connectorRef.current?.rawProvider
+            if (!rawProvider) {
+                throw new Error('没有可以连接的钱包！');
             }
             //网络切换链接
             //https://docs.metamask.io/metamask-connect/evm/reference/json-rpc-api/wallet_switchEthereumChain/
             try {
                 //发起切换指定激活的网络
-                await window.ethereum.request({
+                await rawProvider.request({
                     method: 'wallet_switchEthereumChain',
                     params: [
                         { chainId: `0x${selectChainID.toString(16)}` }
@@ -156,7 +157,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
                     //当前要切换的链，还没添加到用户钱包里
                     //把当前链路加至钱包中
                     //https://docs.metamask.io/metamask-connect/evm/reference/json-rpc-api/wallet_addEthereumChain/
-                    window.ethereum.request({
+                    rawProvider.request({
                         method: 'wallet_addEthereumChain',
                         params: [
                             {
