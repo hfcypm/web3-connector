@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
 import { getBalanceFast } from "./okx_balance";
+import { parseChainId } from "../utils";
 
 // ─── 全局钱包事件名称常量 ───────────────────────────────────────────────────────
 // 所有 connector 统一通过 window.dispatchEvent 派发这些自定义事件，
@@ -228,7 +229,7 @@ export async function handleWalletConnection(
      */
     const handleChainChanged = (newChainIdHex: string) => {
         console.log(`[${walletName}] handleChainChanged: ${newChainIdHex}`);
-        const newChainId = Number.parseInt(newChainIdHex, 16);
+        const newChainId = parseChainId(newChainIdHex);
         lastBalance = -1n;
         //只有非 OKX 钱包才重建 provider
         if (!isOkxWallet) {

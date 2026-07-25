@@ -143,3 +143,16 @@ export const getNetworkName = (chainId: number): string => {
 
     return networks[chainId] || `Chain ${chainId}`;
 };
+
+/** 根据不同钱包 EIP1193返回 网络chainID类型不同 做兼容转换 */
+export const parseChainId = (value: string | number) => {
+    if (typeof value === 'number') {
+        return value;
+    }
+
+    if (value.startsWith('0x')) {
+        return Number.parseInt(value, 16);
+    } else {
+        return Number(value)
+    }
+}
