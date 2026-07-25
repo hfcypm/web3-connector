@@ -70,8 +70,8 @@ export async function handleWalletConnection(
     console.log("accounts", await rawProvider.request({ method: "eth_accounts" }));
 
     // 获取 Signer（包含私钥签名能力的对象）及其地址
-    const signer = await provider.getSigner();
-    const address = await signer.getAddress();
+    let signer = await provider.getSigner();
+    let address = await signer.getAddress();
     console.log(`[${walletName}] --------连接成功-------address: ${address}`);
 
     // 单独处理 OKX 钱包的特殊余额查询逻辑
@@ -113,12 +113,19 @@ export async function handleWalletConnection(
     const refreshBalance = async () => {
         if (disposed) return; // 已断开，忽略
         try {
+            const requestAddress = address;
+
+            //根据地址获取最新balance
             let next: bigint;
             if (isOkxWallet) {
-                next = await getBalanceFast(rawProvider, address);
+                next = await getBalanceFast(rawProvider, requestAddress);
             } else {
-                next = await provider.getBalance(address);
+                next = await provider.getBalance(requestAddress);
             }
+            if (requestAddress !== address) {
+                return;
+            }
+
             if (next !== lastBalance) {
                 console.log(`[${walletName}] refreshBalance: ${next}`);
                 lastBalance = next;
