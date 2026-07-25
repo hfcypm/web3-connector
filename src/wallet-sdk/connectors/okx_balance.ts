@@ -12,16 +12,22 @@ const RPC_BY_CHAIN: Record<string, string> = {
 };
 
 export async function getBalanceFast(rawProvider: any, address: string) {
-    const chainIdHex: string = await rawProvider.request({
-        method: "eth_chainId",
-    });
+    const balanceHex = await rawProvider.request({
+        method: "eth_getBalance",
+        params: [address, "latest"],
+    })
+    return balanceHex;
+    //   return BigInt(balanceHex)
+    //     const chainIdHex: string = await rawProvider.request({
+    //         method: "eth_chainId",
+    //     });
 
-    const rpcUrl = RPC_BY_CHAIN[chainIdHex];
+    //     const rpcUrl = RPC_BY_CHAIN[chainIdHex];
 
-    if (!rpcUrl) {
-        throw new Error(`No RPC configured for chain ${chainIdHex}`);
-    }
+    //     if (!rpcUrl) {
+    //         throw new Error(`No RPC configured for chain ${chainIdHex}`);
+    //     }
 
-    const readProvider = new ethers.JsonRpcProvider(rpcUrl);
-    return await readProvider.getBalance(address);
+    //     const readProvider = new ethers.JsonRpcProvider(rpcUrl);
+    //     return await readProvider.getBalance(address);
 }
