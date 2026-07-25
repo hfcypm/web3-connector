@@ -4,6 +4,7 @@ import { WalletModal } from "../componets/WalletModal";
 import { chainIDNameDict } from "../const/network";
 import { WALLET_EVENTS, type ConnectionResult } from "../connectors/_sharedwallet";
 import { WalletContext } from "./WalletContext";
+import { getStorageItem, setStorageItem } from "../utils/index"
 
 
 /**
@@ -73,6 +74,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
             currentConnectwalletID: '',
             provider: undefined,
         }));
+        localStorage.removeItem('lastConnectedWallet')
     }, []);
 
     // 连接钱包
@@ -95,6 +97,9 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
             currentConnectwalletName: wallet.name,
             error: null,
         }));
+
+        //存储钱包的ID 以便于下次更好的连接 有效时长为12h
+        setStorageItem('lastConnectedWallet', walletId, 12)
 
         try {
             const result = await wallet.connector();
@@ -249,11 +254,24 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         };
     }, []);
 
+    //把钱包列表转换为字典形式
+    const walletMap = useMemo(() => {
+        return wallets.reduce<Record<string, Wallet>>((dict, wallet) => {
+            dict[wallet.id] = wallet;
+            return dict;
+        }, {});
+    }, [wallets])
+
+    //挂载的时候 根据钱包根据外部传来的状态 自动进行挂载
     useEffect(() => {
         if (autoConnect) {
-            // value.connect(...) 需要 walletId，autoConnect 暂未实现
+            const lastConnectedWalletId = getStorageItem<string>('lastConnectedWallet');
+            console.log('上次存储的钱包ID：', lastConnectedWalletId);
+            if (lastConnectedWalletId && walletMap[lastConnectedWalletId]) {
+                connect(lastConnectedWalletId)
+            }
         }
-    }, [autoConnect]);
+    }, [autoConnect, walletMap]);
 
     // 组件卸载时清理 connector（页面跳转/热更新场景）
     useEffect(() => {
