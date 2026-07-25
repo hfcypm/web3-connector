@@ -81,15 +81,10 @@ export async function handleWalletConnection(
 
     if (isOkxWallet) {
         console.log(`[${walletName}] --------开始查询okx初始余额-----------`);
-        // OKX：原生RPC查询（必准）okx不能通过getbalance获取余额，只能通过eth_getBalance获取
-        // OKX返回hex字符串："0x..."
-        // const balanceHex: string = await rawProvider.request({
-        //     method: "eth_getBalance",
-        //     params: [address, "latest"],
-        // });
-        // // 关键：hex字符串转bigint
-        // initialBalance = BigInt(balanceHex);
-        initialBalance = await getBalanceFast(rawProvider, currentAddress);
+        initialBalance = await rawProvider.request({
+            method: "eth_getBalance",
+            params: [currentAddress, "latest"],
+        });
         console.log(`[${walletName}] --------结束okx初始余额查询-----------，余额: ${initialBalance}`);
     } else {
         initialBalance = await provider.getBalance(currentAddress);
