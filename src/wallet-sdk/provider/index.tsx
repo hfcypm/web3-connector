@@ -222,11 +222,19 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         };
 
         const handleBalanceChanged = (event: Event) => {
-            const { balance } = (event as CustomEvent).detail;
-            setState(prev => ({
-                ...prev,
-                balance: typeof balance === 'bigint' ? balance.toString() : String(balance),
-            }));
+            //账户快速切换时，旧请求可能覆盖当前账户 UI
+            //监听余额事件时读取事件中的地址
+            const { balance, address } = (event as CustomEvent).detail;
+            setState((prev) => {
+                // 余额属于旧账户时，保持当前页面状态
+                if (address.toLowerCase() !== prev.address?.toLowerCase()) {
+                    return prev;
+                }
+                return {
+                    ...prev,
+                    balance: typeof balance === 'bigint' ? balance.toString() : String(balance),
+                }
+            });
         };
 
         window.addEventListener(WALLET_EVENTS.chainChanged, handleChainChanged);

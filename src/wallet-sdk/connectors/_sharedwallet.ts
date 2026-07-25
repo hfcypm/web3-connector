@@ -119,8 +119,8 @@ export async function handleWalletConnection(
             const next = isOkxWallet ? await getBalanceFast(rawProvider, requestAddress)
                 : await provider.getBalance(requestAddress);
 
-            // 请求返回时账号已切换，忽略旧账号结果
-            if (requestAddress.toLocaleLowerCase !== currentAddress.toLocaleLowerCase) {
+            // 请求返回时账号已切换，忽略旧账号结果 类型判断加toLowerCase()
+            if (requestAddress.toLowerCase() !== currentAddress.toLowerCase()) {
                 return;
             }
 
@@ -130,7 +130,7 @@ export async function handleWalletConnection(
                 // 派发全局自定义事件，WalletProvider 监听后更新 React state
                 window.dispatchEvent(
                     new CustomEvent(WALLET_EVENTS.balanceChanged, {
-                        detail: { balance: next },
+                        detail: { balance: next, address: requestAddress },
                     }),
                 );
                 toast.success("Balance updated successfully.");
