@@ -10,7 +10,7 @@ import { getStorageItem, setStorageItem } from "../utils/index"
 /**
  * 钱包全局 provider
  */
-export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains, provider, autoConnect, wallets }) => {
+export const WalletProvider: React.FC<WalletProviderProps> = ({ children: children, chains, provider, autoConnect, wallets }) => {
     const [state, setState] = useState<WalletState>({
         address: '',
         currentConnectwalletID: '',
@@ -31,6 +31,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
     const connectorRef = useRef<ConnectionResult | null>(null);
 
     // 钱包字典 - 用于快速查找钱包
+    // 把钱包列表转换为字典形式
     const wallletDict = useMemo(() => {
         return wallets.reduce((acc, wallet) => {
             acc[wallet.id] = wallet;
@@ -254,23 +255,15 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
         };
     }, []);
 
-    //把钱包列表转换为字典形式
-    const walletMap = useMemo(() => {
-        return wallets.reduce<Record<string, Wallet>>((dict, wallet) => {
-            dict[wallet.id] = wallet;
-            return dict;
-        }, {});
-    }, [wallets])
-
     //挂载的时候 根据钱包根据外部传来的状态 自动进行挂载
     useEffect(() => {
         if (autoConnect) {
             const lastConnectedWalletId = getStorageItem<string>('lastConnectedWallet');
-            if (lastConnectedWalletId && walletMap[lastConnectedWalletId]) {
+            if (lastConnectedWalletId && wallletDict[lastConnectedWalletId]) {
                 connect(lastConnectedWalletId)
             }
         }
-    }, [autoConnect, walletMap]);
+    }, [autoConnect, wallletDict]);
 
     // 组件卸载时清理 connector（页面跳转/热更新场景）
     useEffect(() => {
