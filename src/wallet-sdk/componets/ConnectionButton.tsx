@@ -91,7 +91,7 @@ export default function ConnectionButton({
 
                         {/* 地址 */}
                         <div className='relative'>
-                            <div className='flex h-10 items-center justify-center border border-gray-300 rounded-lg p-2'>
+                            <div className='flex h-10 w-40 items-center justify-center border border-gray-300 rounded-lg p-2'>
                                 <Globe className='w-6 h-6 text-gray-500'></Globe>
                                 <div className='ml-2'>{netName}</div>
                                 <ChevronDown
@@ -134,7 +134,7 @@ export default function ConnectionButton({
                         </div>
 
                         <div className='flex flex-row h-10 justify-center items-center ml-4 px-2 border border-gray-300 rounded-md'>
-                            {/* 显示前5个字符  超出显示省略号 */}
+                            {/* 显示前5个字符  超出显示省略号 显示前 5位：w-[5ch] */}
                             <div className='ml-2 w-[5ch] overflow-hidden text-ellipsis whitespace-nowrap'>{address}</div>
                             {/* 余额 */}
                             <div className='px-2'>{showBalance} ETH</div>

@@ -71,8 +71,8 @@ export async function handleWalletConnection(
 
     // 获取 Signer（包含私钥签名能力的对象）及其地址
     let signer = await provider.getSigner();
-    let address = await signer.getAddress();
-    console.log(`[${walletName}] --------连接成功-------address: ${address}`);
+    let currentAddress = await signer.getAddress();
+    console.log(`[${walletName}] --------连接成功-------address: ${currentAddress}`);
 
     // 单独处理 OKX 钱包的特殊余额查询逻辑
     let initialBalance = 0n;
@@ -89,10 +89,10 @@ export async function handleWalletConnection(
         // });
         // // 关键：hex字符串转bigint
         // initialBalance = BigInt(balanceHex);
-        initialBalance = await getBalanceFast(rawProvider, address);
+        initialBalance = await getBalanceFast(rawProvider, currentAddress);
         console.log(`[${walletName}] --------结束okx初始余额查询-----------，余额: ${initialBalance}`);
     } else {
-        initialBalance = await provider.getBalance(address);
+        initialBalance = await provider.getBalance(currentAddress);
     }
     console.log(`[${walletName}] --------获取初始余额-----------: ${initialBalance}`);
     // 获取当前链 ID
@@ -111,18 +111,16 @@ export async function handleWalletConnection(
      * 所有调用路径（轮询 / 切链 / 外部手动触发）都走这个函数。
      */
     const refreshBalance = async () => {
-        if (disposed) return; // 已断开，忽略
-        try {
-            const requestAddress = address;
+        if (disposed) return;
 
-            //根据地址获取最新balance
-            let next: bigint;
-            if (isOkxWallet) {
-                next = await getBalanceFast(rawProvider, requestAddress);
-            } else {
-                next = await provider.getBalance(requestAddress);
-            }
-            if (requestAddress !== address) {
+        const requestAddress = currentAddress;
+        try {
+            //根据地址获取最新balance(okx 获取原生余额需要单独方法处理 )
+            const next = isOkxWallet ? await getBalanceFast(rawProvider, requestAddress)
+                : await provider.getBalance(requestAddress);
+
+            // 请求返回时账号已切换，忽略旧账号结果
+            if (requestAddress.toLocaleLowerCase !== currentAddress.toLocaleLowerCase) {
                 return;
             }
 
@@ -187,12 +185,27 @@ export async function handleWalletConnection(
      * - 新账户列表为空 → 视为断开
      * - 否则派发 connected 事件并刷新余额
      */
-    const handleAccountsChanged = (newAccounts: string[]) => {
+    const handleAccountsChanged = async (newAccounts: string[]) => {
         if (!newAccounts || newAccounts.length === 0) {
             // 账户列表清空，视为用户在扩展内断开了连接
             window.dispatchEvent(new CustomEvent(WALLET_EVENTS.disconnected));
             return;
         }
+        //从新账号获取最新地址
+        const nextAddress = newAccounts[0];
+
+        if (nextAddress.toLowerCase() === currentAddress.toLowerCase()) {
+            //地址相等 不再处理下面流程(toLowerCase 不加括号就是类型判断  也是走相等的)
+            return;
+        }
+
+        //重新调整及签名
+        currentAddress = nextAddress;
+        signer = await provider.getSigner(currentAddress);
+
+        //强制切换账号 余额查询派发事件
+        lastBalance = -1n;
+
         window.dispatchEvent(
             new CustomEvent(WALLET_EVENTS.connected, {
                 detail: { account: newAccounts },
@@ -206,7 +219,7 @@ export async function handleWalletConnection(
     const connectionResult = {
         accounts,
         signer,
-        address,
+        address: currentAddress,
         chainId,
         provider,
         rawProvider,
