@@ -68,7 +68,6 @@ export async function handleWalletConnection(
 
     // 弹出授权弹窗，用户同意后返回授权地址列表
     const accounts: string[] = await provider.send("eth_requestAccounts", []);
-    console.log("accounts", await rawProvider.request({ method: "eth_accounts" }));
 
     // 获取 Signer（包含私钥签名能力的对象）及其地址
     let signer = await provider.getSigner();
@@ -86,11 +85,9 @@ export async function handleWalletConnection(
             method: "eth_getBalance",
             params: [currentAddress, "latest"],
         });
-        console.log(`[${walletName}] --------结束okx初始余额查询-----------，余额: ${initialBalance}`);
     } else {
         initialBalance = await provider.getBalance(currentAddress);
     }
-    console.log(`[${walletName}] --------获取初始余额-----------: ${initialBalance}`);
     // 获取当前链 ID
     const { chainId } = await provider.getNetwork();
 
@@ -121,7 +118,6 @@ export async function handleWalletConnection(
             }
 
             if (next !== lastBalance) {
-                console.log(`[${walletName}] refreshBalance: ${next}`);
                 lastBalance = next;
                 // 派发全局自定义事件，WalletProvider 监听后更新 React state
                 window.dispatchEvent(

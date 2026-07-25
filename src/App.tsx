@@ -17,7 +17,6 @@ function App() {
 
   //收到网络切换事件
   const onChainChangeEvent = (fromChainId: number, toChainId: number) => {
-    console.log(`网络切换: ${fromChainId} → ${toChainId}`);
   };
 
   return (

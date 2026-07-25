@@ -266,7 +266,6 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
     useEffect(() => {
         if (autoConnect) {
             const lastConnectedWalletId = getStorageItem<string>('lastConnectedWallet');
-            console.log('上次存储的钱包ID：', lastConnectedWalletId);
             if (lastConnectedWalletId && walletMap[lastConnectedWalletId]) {
                 connect(lastConnectedWalletId)
             }
