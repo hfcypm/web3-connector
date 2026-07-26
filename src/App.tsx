@@ -4,7 +4,7 @@ import { ConnectionButton, WalletProvider } from './wallet-sdk'
 import { supportChainsConfigs } from './wallet-sdk/const/chain'
 import { showWallets } from './wallet-sdk/const/wallets'
 import './App.css'
-import { jsx } from 'react/jsx-runtime'
+import 'highlight.js/styles/github.css'
 import { highlightedCode } from './wallet-sdk/utils'
 
 const styles = {
