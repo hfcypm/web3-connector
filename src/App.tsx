@@ -61,7 +61,7 @@ function App() {
               <h2 className='text-2xl font-bold text-gray-800'>标题组件展示</h2>
               <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 min-w-0 p-6'>
 
-                <div className='flex flex-col rounded-2xl p-2 shadow-xl'>
+                <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>
                   <text className='font-bold text-2xl'>默认样式</text>
                   <ConnectionButton showWalletName={true} onChainChange={onChainChangeEvent} />
                   <pre className='max-h-80 overflow-auto rounded-lg text-left text-sm leading-6'>
@@ -72,7 +72,7 @@ function App() {
                   </pre>
                 </div>
 
-                <div className='flex flex-col rounded-2xl p-2 shadow-xl'>
+                <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>
                   <text className='font-bold text-2xl'>默认样式2</text>
                   <ConnectionButton showWalletName={true} onChainChange={onChainChangeEvent} />
                   <pre className='max-h-80 overflow-auto rounded-lg text-left text-sm leading-6'>
@@ -83,7 +83,7 @@ function App() {
                   </pre>
                 </div>
 
-                <div className='flex flex-col rounded-2xl p-2 shadow-xl'>
+                <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>
                   <text className='font-bold text-2xl'>默认样式3</text>
                   <ConnectionButton showWalletName={true} onChainChange={onChainChangeEvent} />
                   <pre className='max-h-80 overflow-auto rounded-lg text-left text-sm leading-6'>
