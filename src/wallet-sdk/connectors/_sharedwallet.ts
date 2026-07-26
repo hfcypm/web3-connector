@@ -62,7 +62,6 @@ export async function handleWalletConnection(
     rawProvider: any,
     walletName: string,
 ): Promise<ConnectionResult> {
-    console.log(`[${walletName}] --------开始连接-----------`);
     // 用 rawProvider 构造 ethers BrowserProvider，后续所有 RPC 调用都走这里
     let provider = new ethers.BrowserProvider(rawProvider);
 
@@ -72,15 +71,12 @@ export async function handleWalletConnection(
     // 获取 Signer（包含私钥签名能力的对象）及其地址
     let signer = await provider.getSigner();
     let currentAddress = await signer.getAddress();
-    console.log(`[${walletName}] --------连接成功-------address: ${currentAddress}`);
 
     // 单独处理 OKX 钱包的特殊余额查询逻辑
     let initialBalance = 0n;
     const isOkxWallet = rawProvider.isOKExWallet;
-    console.log(`[${walletName}] --------是否OKX钱包-----------: ${isOkxWallet}`);
 
     if (isOkxWallet) {
-        console.log(`[${walletName}] --------开始查询okx初始余额-----------`);
         initialBalance = await rawProvider.request({
             method: "eth_getBalance",
             params: [currentAddress, "latest"],
@@ -224,7 +220,6 @@ export async function handleWalletConnection(
      * - 将 lastBalance 重置为 -1n，确保下次 refreshBalance 一定会派发 balanceChanged
      */
     const handleChainChanged = (newChainIdHex: string) => {
-        console.log(`[${walletName}] handleChainChanged: ${newChainIdHex}`);
         const newChainId = parseChainId(newChainIdHex);
         lastBalance = -1n;
         //只有非 OKX 钱包才重建 provider
@@ -302,9 +297,7 @@ export async function handleWalletConnection(
     // 发起转账交易（已通过包装 signer.sendTransaction 自动等待确认并刷新余额）
     const sendTransaction = async (tx: ethers.TransactionRequest) => {
         const transaction = await signer.sendTransaction(tx);
-        console.log("交易发送成功:", transaction.hash);
         const receipt = await transaction.wait();
-        console.log("交易上链成功:", receipt);
         return receipt;
     }
 

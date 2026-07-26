@@ -73,6 +73,7 @@ export default function ConnectionButton({
             }
         } catch (error) {
             console.log('网络切换异常:', error)
+            console.log('fail to change network', error);
         }
         setIsDropdownOpen(false)
     }, [chaindID, switchChain, onChainChange])

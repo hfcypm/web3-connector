@@ -10,7 +10,7 @@ import { getStorageItem, setStorageItem } from "../utils/index"
 /**
  * 钱包全局 provider
  */
-export const WalletProvider: React.FC<WalletProviderProps> = ({ children: children, chains, provider, autoConnect, wallets }) => {
+export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains, provider, autoConnect, wallets }) => {
     const [state, setState] = useState<WalletState>({
         address: '',
         currentConnectwalletID: '',
