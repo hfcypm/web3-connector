@@ -8,9 +8,9 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/jacobscod-wallet-sdk.es.js",
-      "require": "./dist/jacobscod-wallet-sdk.cjs.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/jacobscod-wallet-sdk.cjs.js"
     }
   },
   "files": [
@@ -46,6 +46,7 @@
     "globals": "^16.5.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.48.0",
+    "terser": "^5.49.0",
     "vite": "^7.3.1"
   }
 }
