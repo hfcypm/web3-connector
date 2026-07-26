@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import dts from 'unplugin-dts/vite'
 import { resolve } from 'path';
 
 // https://vite.dev/config/
@@ -8,7 +9,18 @@ export default defineConfig(({ mode }) => {
   const isLib = mode === 'lib';
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      ...(isLib
+        ? [dts({
+            entryRoot: 'src/wallet-sdk',
+            include: ['src/wallet-sdk'],
+            outDir: 'dist',
+            tsconfigPath: resolve(__dirname, 'tsconfig.app.json'),
+          })]
+        : []),
+    ],
     optimizeDeps: {
       exclude: ['lucide-react'],
     },
@@ -22,7 +34,10 @@ export default defineConfig(({ mode }) => {
         // 库名称
         name: 'JacobscodWalletSDK',
         // 输出文件名
-        fileName: (format) => `jacobscod-wallet-sdk.${format}.js`,
+        fileName: (format) =>
+          format === 'cjs'
+            ? 'jacobscod-wallet-sdk.cjs'
+            : `jacobscod-wallet-sdk.${format}.js`,
         // 输出格式
         formats: ['es', 'umd', 'cjs']
       },
