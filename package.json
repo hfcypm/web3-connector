@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "description": "A lightweight wallet SDK for Web3 applications",
   "type": "module",
-  "main": "./dist/jacobscod-wallet-sdk.cjs",
-  "module": "./dist/jacobscod-wallet-sdk.es.js",
+  "main": "./dist/jacobscodwb3-wallet-sdk.cjs.js",
+  "module": "./dist/jacobscodwb3-wallet-sdk.es.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/jacobscod-wallet-sdk.es.js",
-      "require": "./dist/jacobscod-wallet-sdk.cjs"
+      "import": "./dist/jacobscodwb3-wallet-sdk.es.js",
+      "require": "./dist/jacobscodwb3-wallet-sdk.cjs.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [

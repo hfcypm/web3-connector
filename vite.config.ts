@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import dts from 'unplugin-dts/vite'
 import { resolve } from 'path';
 
 // https://vite.dev/config/
@@ -9,18 +8,7 @@ export default defineConfig(({ mode }) => {
   const isLib = mode === 'lib';
 
   return {
-    plugins: [
-      react(),
-      tailwindcss(),
-      ...(isLib
-        ? [dts({
-            entryRoot: 'src/wallet-sdk',
-            include: ['src/wallet-sdk'],
-            outDir: 'dist',
-            tsconfigPath: resolve(__dirname, 'tsconfig.app.json'),
-          })]
-        : []),
-    ],
+    plugins: [react(), tailwindcss()],
     optimizeDeps: {
       exclude: ['lucide-react'],
     },
@@ -32,12 +20,9 @@ export default defineConfig(({ mode }) => {
         // 入口文件
         entry: resolve(__dirname, 'src/wallet-sdk/index.ts'),
         // 库名称
-        name: 'JacobscodWalletSDK',
+        name: 'JacobscodeWb3WalletSDK',
         // 输出文件名
-        fileName: (format) =>
-          format === 'cjs'
-            ? 'jacobscod-wallet-sdk.cjs'
-            : `jacobscod-wallet-sdk.${format}.js`,
+        fileName: (format) => `jacobscodewb-wallet-sdk.${format}.js`,
         // 输出格式
         formats: ['es', 'umd', 'cjs']
       },
@@ -85,10 +70,10 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks: {
             'vendor': ['react', 'react-dom'],
-            // 'highlight': ['highlight.js']
+            'highlight': ['highlight.js']
           }
         }
       }
     },
   };
-})
+});
