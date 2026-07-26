@@ -1,8 +1,21 @@
 {
-  "name": "web3-connector",
-  "private": true,
-  "version": "0.0.0",
+  "name": "jacobscod-wallet-sdk",
+  "version": "1.0.0",
+  "description": "A lightweight wallet SDK for Web3 applications",
   "type": "module",
+  "main": "./dist/jacobscod-wallet-sdk.cjs.js",
+  "module": "./dist/jacobscod-wallet-sdk.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/jacobscod-wallet-sdk.es.js",
+      "require": "./dist/jacobscod-wallet-sdk.cjs.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
