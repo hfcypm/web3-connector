@@ -7,7 +7,7 @@ React wallet connection components for EVM-compatible browser wallets. The packa
 - React 19 or later
 - A browser wallet extension such as MetaMask, Coinbase Wallet, OKX Wallet, or Phantom
 - An RPC URL for every configured chain
-- Tailwind CSS v4 for the built-in component styles
+- Built-in component styles are injected when the SDK is imported
 
 ## Installation
 
@@ -61,17 +61,9 @@ export default function App() {
 
 `autoConnect` restores the most recently connected wallet from local storage. Replace the example RPC URLs before deploying an application.
 
-## Tailwind CSS
+## Built-in Styles
 
-`ConnectionButton` uses Tailwind utility classes. Tailwind v4 excludes dependencies from automatic source detection, so register the SDK in the consuming application's stylesheet.
-
-```css
-@import "tailwindcss";
-/* 让 Tailwind 扫描 SDK 中的工具类 */
-@source "../node_modules/jacobscod-wallet-sdk";
-```
-
-Adjust the relative path to match the location of the stylesheet in your application.
+The SDK compiles and injects the styles for built-in components when an application imports the package. Applications can use `ConnectionButton` and `WalletModal` without adding Tailwind CSS or an SDK `@source` directive.
 
 ## Exports
 
