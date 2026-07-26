@@ -1,14 +1,30 @@
-import { defineConfig } from 'vite'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig, type PluginOption } from 'vite'
 import react from '@vitejs/plugin-react'
+import dts from 'unplugin-dts/vite'
 import { resolve } from 'path';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const isLib = mode === 'lib';
+  const plugins: PluginOption[] = [react()];
+
+  if (isLib) {
+    plugins.push(dts({
+      entryRoot: 'src/wallet-sdk',
+      include: ['src/wallet-sdk'],
+      outDirs: ['dist'],
+      tsconfigPath: resolve(__dirname, 'tsconfig.app.json'),
+    }));
+  } else {
+    const tailwindcss = require('@tailwindcss/vite').default as () => PluginOption;
+    plugins.push(tailwindcss());
+  }
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins,
     optimizeDeps: {
       exclude: ['lucide-react'],
     },
@@ -20,9 +36,12 @@ export default defineConfig(({ mode }) => {
         // 入口文件
         entry: resolve(__dirname, 'src/wallet-sdk/index.ts'),
         // 库名称
-        name: 'JacobscodeWb3WalletSDK',
+        name: 'JacobscodWb3WalletSDK',
         // 输出文件名
-        fileName: (format) => `jacobscodewb-wallet-sdk.${format}.js`,
+        fileName: (format: string) =>
+          format === 'cjs'
+            ? 'jacobscodwb3-wallet-sdk.cjs'
+            : `jacobscodwb3-wallet-sdk.${format}.js`,
         // 输出格式
         formats: ['es', 'umd', 'cjs']
       },

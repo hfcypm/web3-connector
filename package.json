@@ -1,16 +1,16 @@
 {
   "name": "jacobscod-wallet-sdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A lightweight wallet SDK for Web3 applications",
   "type": "module",
-  "main": "./dist/jacobscodwb3-wallet-sdk.cjs.js",
+  "main": "./dist/jacobscodwb3-wallet-sdk.cjs",
   "module": "./dist/jacobscodwb3-wallet-sdk.es.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/jacobscodwb3-wallet-sdk.es.js",
-      "require": "./dist/jacobscodwb3-wallet-sdk.cjs.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/jacobscodwb3-wallet-sdk.cjs"
     }
   },
   "files": [
@@ -20,6 +20,7 @@
     "dev": "vite",
     "build": "vite build --mode lib",
     "build:demo": "vite build",
+    "prepack": "npm run build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -33,6 +34,11 @@
     "react-toastify": "^11.1.0",
     "tailwindcss": "^4.2.1",
     "wagmi": "^3.5.0"
+  },
+  "peerDependencies": {
+    "ethers": "^6.16.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
