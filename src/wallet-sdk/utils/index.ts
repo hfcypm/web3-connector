@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import hljs from 'highlight.js';
 
 /**
  * 检测 OKX 钱包是否安装
@@ -154,5 +155,25 @@ export const parseChainId = (value: string | number) => {
         return Number.parseInt(value, 16);
     } else {
         return Number(value)
+    }
+}
+
+/** 代码高亮方式 */
+export const highlightedCode = (code: string, language: string = 'jsx') => {
+    try {
+        const languageDic: { [key: string]: string } = {
+            'jsx': 'javascript',
+            'tsx': 'typescript',
+            'ts': 'typescript',
+            'js': 'javascript'
+        }
+        const hlLanguage = languageDic[language] || language;
+        //使用引入的库进行高亮
+        const result = hljs.highlight(code, { language: hlLanguage })
+        return result.value
+    } catch {
+        // 降级到自动检测语言
+        console.log('降级到自动检测语言')
+        return hljs.highlightAuto(code).value;
     }
 }
