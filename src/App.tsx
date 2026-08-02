@@ -20,7 +20,7 @@ const styles = {
   size='sm' 
   showBanlance={false} 
   onChainChange={onChainChangeEvent}
-  className="bg-red-400 text-black"/>`
+  className="bg-purple-300 text-black text-4xl hover:bg-orange-300"/>`
 }
 
 function App() {
@@ -88,7 +88,7 @@ function App() {
                   <text className='font-bold text-2xl'>默认样式3</text>
                   <ConnectionButton showWalletName={true} size='sm' showBanlance={false}
                     onChainChange={onChainChangeEvent}
-                    className={`bg-red-400 text-black`}
+                    className="bg-purple-300 text-black text-4xl hover:bg-orange-300"
                   />
                   <pre className='max-h-80 overflow-auto rounded-lg text-left text-sm leading-6'>
                     <code

@@ -2,7 +2,7 @@ import { useWallet } from '../provider'
 import { Globe, Power, ChevronDown } from 'lucide-react';
 import { formatEther } from 'ethers';
 import React, { useState, useCallback } from 'react';
-import clsx from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 
 //自定义当前连接属性
@@ -79,9 +79,6 @@ export default function ConnectionButton({
     }, [chaindID, switchChain, onChainChange])
     /** ---------change network end--------- */
 
-
-    console.log('当前未连接主题样式：', className)
-
     if (isConnected) {
         //已连接状态断开钱包链接
         return (
@@ -154,7 +151,7 @@ export default function ConnectionButton({
         // 未连接状态 连接钱包
         return (
             <button className={
-                clsx("bg-blue-400 text-white font-bold py-2 px-4 rounded hover:bg-blue-500 "
+                twMerge("bg-blue-400 text-white font-bold py-2 px-4 rounded hover:bg-blue-500 "
                     , sizeClass[size]
                     , className
                 )}
