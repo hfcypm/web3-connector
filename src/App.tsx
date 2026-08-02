@@ -10,19 +10,17 @@ import { highlightedCode } from './wallet-sdk/utils'
 const styles = {
   style: `<ConnectionButton/>`,
   style1: `<ConnectButton   
-  label="连接钱包"
-  size="lg"
-  showBalance={true}
-  chainStatus="full"
-  accountStatus="full"
-  onConnect={handleConnect}
+  label='连接钱包' 
+  showWalletName={true} 
+  size='lg' 
+  onChainChange={onChainChangeEvent}
   />`,
   style2: `<ConnectButton 
-  size="sm"
-  chainStatus="icon"
-  accountStatus="address"
-  showBalance={false}
-  className="shadow-md"/>`
+  showWalletName={true}
+  size='sm' 
+  showBanlance={false} 
+  onChainChange={onChainChangeEvent}
+  className="bg-red-400 text-black"/>`
 }
 
 function App() {
@@ -59,11 +57,12 @@ function App() {
             {/* 2. 标题组件展示 */}
             <div className='space-y-6'>
               <h2 className='text-2xl font-bold text-gray-800'>标题组件展示</h2>
-              <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 min-w-0 p-6'>
+              <div className='grid grid-cols-1 md:grid-cols-1 xl:grid-cols-2 gap-6 min-w-0 p-6'>
 
+                {/* 默认样式 */}
                 <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>
                   <text className='font-bold text-2xl'>默认样式</text>
-                  <ConnectionButton showWalletName={true} onChainChange={onChainChangeEvent} />
+                  <ConnectionButton />
                   <pre className='max-h-80 overflow-auto rounded-lg text-left text-sm leading-6'>
                     <code
                       className='hljs language-jsx'
@@ -72,9 +71,10 @@ function App() {
                   </pre>
                 </div>
 
+                {/* 默认样式2 */}
                 <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>
                   <text className='font-bold text-2xl'>默认样式2</text>
-                  <ConnectionButton showWalletName={true} onChainChange={onChainChangeEvent} />
+                  <ConnectionButton label='连接钱包' showWalletName={true} size='lg' onChainChange={onChainChangeEvent} />
                   <pre className='max-h-80 overflow-auto rounded-lg text-left text-sm leading-6'>
                     <code
                       className='hljs language-jsx'
@@ -83,9 +83,13 @@ function App() {
                   </pre>
                 </div>
 
+                {/* 默认样式3 */}
                 <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>
                   <text className='font-bold text-2xl'>默认样式3</text>
-                  <ConnectionButton showWalletName={true} onChainChange={onChainChangeEvent} />
+                  <ConnectionButton showWalletName={true} size='sm' showBanlance={false}
+                    onChainChange={onChainChangeEvent}
+                    className={`bg-red-400 text-black`}
+                  />
                   <pre className='max-h-80 overflow-auto rounded-lg text-left text-sm leading-6'>
                     <code
                       className='hljs language-jsx'

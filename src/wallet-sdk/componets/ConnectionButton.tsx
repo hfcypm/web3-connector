@@ -1,7 +1,8 @@
 import { useWallet } from '../provider'
 import { Globe, Power, ChevronDown } from 'lucide-react';
 import { formatEther } from 'ethers';
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
+import clsx from 'clsx'
 
 
 //自定义当前连接属性
@@ -14,14 +15,14 @@ interface ConnectionButtonProps {
     //hook 事件
     onConnection?: () => void;
     onDisConnection?: () => void;
-    onChainChange: (fromChainId: number, toChainId: number) => void;
+    onChainChange?: (fromChainId: number, toChainId: number) => void;
     onBalanceChange?: (balance: string) => void;
     onError?: (error: Error) => void;
 }
 
 export default function ConnectionButton({
     label = 'connect wallet',
-    showBanlance = false,
+    showBanlance = true,//默认展示余额
     size = 'md',
     className = '',
     showWalletName = false,
@@ -51,7 +52,7 @@ export default function ConnectionButton({
     //换算成 ETH（Sepolia ETH）
     const balanceEth = formatEther(balance || '0');
     //保留4位小数
-    const showBalance = parseFloat(balanceEth).toFixed(4);
+    const balanceFixed = parseFloat(balanceEth).toFixed(4);
 
     /** ---------change network start--------- */
     //支持网络的的下拉三角箭头
@@ -78,6 +79,9 @@ export default function ConnectionButton({
     }, [chaindID, switchChain, onChainChange])
     /** ---------change network end--------- */
 
+
+    console.log('当前未连接主题样式：', className)
+
     if (isConnected) {
         //已连接状态断开钱包链接
         return (
@@ -86,8 +90,8 @@ export default function ConnectionButton({
                     <div className='flex h-10 mb-5 flex-row justify-items-center items-center'>
 
                         {/* 钱包名称 */}
-                        {<div className='flex h-10 items-center justify-center border border-gray-300
-                         rounded-lg p-2 hover:bg-gray-400 mr-2'>{currentConnectwalletName}</div>}
+                        {showWalletName ? <div className='flex h-10 items-center justify-center border border-gray-300
+                         rounded-lg p-2 hover:bg-gray-400 mr-2'>{currentConnectwalletName}</div> : null}
 
                         {/* 地址 */}
                         <div className='relative'>
@@ -137,7 +141,8 @@ export default function ConnectionButton({
                             {/* 显示前5个字符  超出显示省略号 显示前 5位：w-[5ch] */}
                             <div className='ml-2 w-[5ch] overflow-hidden text-ellipsis whitespace-nowrap'>{address}</div>
                             {/* 余额 */}
-                            <div className='px-2'>{showBalance} ETH</div>
+                            {showBanlance ? <div className='px-2'>{balanceFixed} ETH</div> : null}
+
                             <Power className='w-5 h-5 text-gray-500 hover:text-gray-700 cursor-pointer' onClick={handleDisconnect}></Power>
                         </div>
                     </div>
@@ -148,7 +153,11 @@ export default function ConnectionButton({
     } else {
         // 未连接状态 连接钱包
         return (
-            <button className={`bg-blue-400 text-white font-bold py-2 px-4 rounded hover:bg-blue-500 ${className} ${sizeClass[size]}`}
+            <button className={
+                clsx("bg-blue-400 text-white font-bold py-2 px-4 rounded hover:bg-blue-500 "
+                    , sizeClass[size]
+                    , className
+                )}
                 onClick={openModal}>{label}</button>
         );
     }
