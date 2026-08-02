@@ -55,7 +55,7 @@ function App() {
             </div>
 
             {/* 2. 标题组件展示 */}
-            <div className='space-y-6'>
+            <div className='space-y-6 mt-5'>
               <h2 className='text-2xl font-bold text-gray-800'>标题组件展示</h2>
               <div className='grid grid-cols-1 md:grid-cols-1 xl:grid-cols-2 gap-6 min-w-0 p-6'>
 
@@ -99,6 +99,19 @@ function App() {
                 </div>
               </div>
             </div>
+
+            {/* 2. Custom组件展示 */}
+            <div className='mt-5 space-x-5'>
+              <h2 className='text-2xl font-bold text-gray-800'>Custom组件展示</h2>
+              <div className='grid grid-cols-1  md:grid-cols-1 xl:grid-cols-2 gap-6 min-w-0 p-6'>
+
+                <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>卡片1</div>
+
+                <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>卡片2</div>
+
+              </div>
+            </div>
+
           </div>
         </div>
       </WalletProvider>
