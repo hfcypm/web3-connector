@@ -20,7 +20,29 @@ const styles = {
   size='sm' 
   showBanlance={false} 
   onChainChange={onChainChangeEvent}
-  className="bg-purple-300 text-black text-4xl hover:bg-orange-300"/>`
+  className="bg-purple-300 text-black text-4xl hover:bg-orange-300"/>`,
+  style3: ` <ConnectionButton.Custom>
+  {({
+    isConnected,
+    address,
+    balance,
+    currentChain,
+    connect,
+    disconnect,
+    error
+  })............`,
+  style4: `
+  <ConnectionButton.Custom>
+  {({ isConnected, address, connect, disconnect }) => (
+    <button
+      onClick={isConnected ? disconnect : connect}
+      className="bg-black text-white px-6 py-3 rounded font-mono text-sm hover:bg-gray-800 transition-colors w-full truncate"
+    >
+      {isConnected ? address?.slice(0, 8) + '...' + address?.slice(-4) : 'Connect'}
+    </button>
+  )}
+</ConnectionButton.Custom>
+`
 }
 
 function App() {
@@ -196,6 +218,13 @@ function App() {
                     </ConnectionButton.Custom>
                   </div>
 
+                  <pre className='max-h-80 overflow-auto rounded-lg text-left text-sm leading-6'>
+                    <code
+                      className='hljs language-jsx'
+                      dangerouslySetInnerHTML={{ __html: highlightedCode(styles.style3, 'jsx') }}
+                    />
+                  </pre>
+
                 </div>
 
                 <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>
@@ -213,6 +242,14 @@ function App() {
                         </button>
                       )}
                     </ConnectionButton.Custom>
+
+                    <pre className='max-h-80 overflow-auto rounded-lg text-left text-sm leading-6'>
+                      <code
+                        className='hljs language-jsx'
+                        dangerouslySetInnerHTML={{ __html: highlightedCode(styles.style4, 'jsx') }}
+                      />
+                    </pre>
+
                   </div>
                 </div>
 
