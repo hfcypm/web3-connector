@@ -105,9 +105,116 @@ function App() {
               <h2 className='text-2xl font-bold text-gray-800'>Custom组件展示</h2>
               <div className='grid grid-cols-1  md:grid-cols-1 xl:grid-cols-2 gap-6 min-w-0 p-6'>
 
-                <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>卡片1</div>
+                {/* 仪表盘风格 */}
+                <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                    仪表板风格
+                  </h3>
+                  <div className="min-w-0 overflow-hidden">
+                    <ConnectionButton.Custom>
+                      {({
+                        isConnected,
+                        address,
+                        balance,
+                        currentChain,
+                        connect,
+                        disconnect,
+                        error
+                      }) => {
+                        if (!isConnected) {
+                          return (
+                            <div className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-4 border-l-4 border-blue-500">
+                              <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+                                连接钱包
+                              </h4>
+                              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                                连接您的钱包以访问所有功能
+                              </p>
+                              <button
+                                onClick={connect}
+                                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded transition-colors"
+                              >
+                                连接钱包
+                              </button>
+                              {error && (
+                                <p className="text-red-500 text-sm mt-2 truncate">
+                                  {error.message}
+                                </p>
+                              )}
+                            </div>
+                          );
+                        }
 
-                <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>卡片2</div>
+                        return (
+                          <div className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-4 border-l-4 border-green-500">
+                            <div className="flex items-center justify-between mb-4">
+                              <h4 className="text-lg font-semibold text-gray-800 dark:text-white">
+                                钱包已连接
+                              </h4>
+                              <div className="flex items-center text-green-600 flex-shrink-0">
+                                <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
+                                <span className="text-sm font-medium">在线</span>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <div>
+                                <label className="text-xs text-gray-500 dark:text-gray-400">地址</label>
+                                <div className="font-mono text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-600 p-2 rounded break-all">
+                                  {address}
+                                </div>
+                              </div>
+
+                              {balance && (
+                                <div>
+                                  <label className="text-xs text-gray-500 dark:text-gray-400">余额</label>
+                                  <div className="text-lg font-semibold text-gray-800 dark:text-gray-200 truncate">
+                                    {balance}
+                                  </div>
+                                </div>
+                              )}
+
+                              {currentChain && (
+                                <div>
+                                  <label className="text-xs text-gray-500 dark:text-gray-400">网络</label>
+                                  <div className="text-sm text-gray-800 dark:text-gray-200 font-medium">
+                                    {currentChain.name}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            <button
+                              onClick={disconnect}
+                              className="w-full mt-4 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 font-medium py-2 px-4 rounded transition-colors"
+                            >
+                              断开连接
+                            </button>
+                          </div>
+                        );
+                      }}
+                    </ConnectionButton.Custom>
+                  </div>
+
+                </div>
+
+                <div className='flex flex-col rounded-2xl p-2 shadow-xl border-2 border-gray-100'>
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                    极简风格
+                  </h3>
+                  <div className="min-w-0 overflow-hidden">
+                    <ConnectionButton.Custom>
+                      {({ isConnected, address, connect, disconnect }) => (
+                        <button
+                          onClick={isConnected ? disconnect : connect}
+                          className="bg-black text-white px-6 py-3 rounded font-mono text-sm hover:bg-gray-800 transition-colors w-full truncate"
+                        >
+                          {isConnected ? address?.slice(0, 8) + '...' + address?.slice(-4) : 'Connect'}
+                        </button>
+                      )}
+                    </ConnectionButton.Custom>
+                  </div>
+                </div>
 
               </div>
             </div>

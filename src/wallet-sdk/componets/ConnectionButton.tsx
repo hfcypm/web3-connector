@@ -1,8 +1,9 @@
 import { useWallet } from '../provider'
 import { Globe, Power, ChevronDown } from 'lucide-react';
-import { formatEther } from 'ethers';
-import React, { useState, useCallback } from 'react';
+import { ethers, formatEther } from 'ethers';
+import React, { useState, useCallback, type FC, useMemo, useEffect } from 'react';
 import { twMerge } from 'tailwind-merge'
+import type { Chain } from '../types';
 
 
 //自定义当前连接属性
@@ -20,14 +21,14 @@ interface ConnectionButtonProps {
     onError?: (error: Error) => void;
 }
 
-export default function ConnectionButton({
+const ConnectionButton: React.FC<ConnectionButtonProps> & { Custom: React.FC<ConnectButtonCustomProps> } = ({
     label = 'connect wallet',
     showBanlance = true,//默认展示余额
     size = 'md',
     className = '',
     showWalletName = false,
     onChainChange
-}: ConnectionButtonProps) {
+}) => {
     //是否展示网络切换下拉菜单
     const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
@@ -159,3 +160,96 @@ export default function ConnectionButton({
         );
     }
 }
+
+//子组件
+
+//1.渲染属性
+export interface ConnectButtonRenderProps {
+    isConnected: boolean;
+    isConnecting: boolean;
+    address: string | null;
+    ensName: string | null;
+    balance: string | null;
+    chainId: number | null;
+    currentChain: Chain | null;
+    chains: Chain[];
+    connect: () => void;
+    disconnect: () => void;
+    switchChain: (chainId: number) => Promise<void>;
+    isDropdownOpen: boolean;
+    setIsDropdownOpen: (open: boolean) => void;
+    error: Error | null;
+
+}
+//2.ConnectButtonCustomProps 触发调用传递属性
+export interface ConnectButtonCustomProps {
+    children: (props: ConnectButtonRenderProps) => React.ReactNode;
+    className?: string;
+}
+
+//3.自定义custom所处理东西
+const ConnectButtonCustom: React.FC<ConnectButtonCustomProps> = ({ children, className = '' }) => {
+    const useWalletContext = useWallet();
+    const [balance, setBalance] = useState<string | null>('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false)
+
+    // 获取当前链信息
+    const currentChain = useMemo(() => {
+        return useWalletContext.chains.find((chain) => useWalletContext.chaindID === chain.id) || null
+    }, [useWalletContext.chains, useWalletContext.chaindID]);
+
+    //余额获取
+    useEffect(() => {
+        const fetchBalance = async () => {
+            if (useWalletContext.address && useWalletContext.isConnected && useWalletContext.provider) {
+                try {
+                    const balanceWeiValue = await useWalletContext.provider.getBalance(useWalletContext.address)
+                    const balanceValue = ethers.formatEther(balanceWeiValue)
+                    setBalance(balanceValue)
+                } catch (error) {
+                    console.log('get balance error:', error)
+                }
+            } else {
+                setBalance(null)
+            }
+        }
+
+        fetchBalance()
+    }, [useWalletContext.address, useWalletContext.isConnected, useWalletContext.provider])
+
+
+    //构造渲染属性
+    const renderProps: ConnectButtonRenderProps = {
+        // 连接状态
+        isConnected: useWalletContext.isConnected,
+        isConnecting: useWalletContext.isConnecting,
+        // 账户信息
+        address: useWalletContext.address,
+        ensName: useWalletContext.ensName,
+        balance,
+        // 网络信息
+        chainId: useWalletContext.chaindID,
+        currentChain,
+        chains: useWalletContext.chains,
+        // 操作方法
+        connect: useWalletContext.openModal,
+        disconnect: useWalletContext.disconnect,
+        switchChain: useWalletContext.switchChain,
+        // UI状态
+        isDropdownOpen,
+        setIsDropdownOpen,
+        // 错误状态
+        error: useWalletContext.error,
+    }
+
+    return (
+        <div className={className}>
+            {children(renderProps)}
+        </div>
+    )
+}
+
+//把当前自定义组加件当作静态组件加入进去
+ConnectionButton.Custom = ConnectButtonCustom
+
+export default ConnectionButton
