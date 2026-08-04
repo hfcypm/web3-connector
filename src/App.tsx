@@ -6,6 +6,7 @@ import { showWallets } from './wallet-sdk/const/wallets'
 import './App.css'
 import 'highlight.js/styles/github.css'
 import { highlightedCode } from './wallet-sdk/utils'
+import { Dice1Icon } from 'lucide-react'
 
 const styles = {
   style: `<ConnectionButton/>`,
@@ -233,14 +234,26 @@ function App() {
                   </h3>
                   <div className="min-w-0 overflow-hidden">
                     <ConnectionButton.Custom>
-                      {({ isConnected, address, connect, disconnect }) => (
-                        <button
-                          onClick={isConnected ? disconnect : connect}
-                          className="bg-black text-white px-6 py-3 rounded font-mono text-sm hover:bg-gray-800 transition-colors w-full truncate"
-                        >
-                          {isConnected ? address?.slice(0, 8) + '...' + address?.slice(-4) : 'Connect'}
-                        </button>
-                      )}
+                      {
+                        ({ isConnected, address, connect, disconnect }) => (
+                          <div>
+                            <button
+                              onClick={isConnected ? disconnect : connect}
+                              className="bg-black text-white px-6 py-3 rounded font-mono text-sm hover:bg-gray-800 transition-colors w-full truncate"
+                            >
+                              {isConnected ? address?.slice(0, 8) + '...' + address?.slice(-4) : 'Connect'}
+                            </button>
+                            {
+                              isConnected && <div onClick={disconnect} className='flex flex-row h-10 items-center 
+                                    justify-center bg-black text-white rounded mt-2 
+                                    hover:bg-gray-800 transition-colors'>
+                                <span>disconnect</span>
+                              </div>
+                            }
+
+                          </div>
+                        )
+                      }
                     </ConnectionButton.Custom>
 
                     <pre className='max-h-80 overflow-auto rounded-lg text-left text-sm leading-6'>
