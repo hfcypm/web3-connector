@@ -212,9 +212,28 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
             }
         };
 
-        const handleWalletDisconnected = () => {
+        // 主动断开了钱包
+        const handleWalletDisconnected = async () => {
             // 钱包侧主动断开（用户在扩展里点了断开），同步清理本地状态
-            connectorRef.current = null;
+            // 先保存引用 避免清理过程中丢失连接器
+            const activeConnector = connectorRef.current;
+            try {
+                if (activeConnector?.disconnect) {
+                    await activeConnector.disconnect;
+                }
+            } catch (error) {
+                console.log('断开钱包连接出现异常：', error)
+            } finally {
+                // 只有当前引用仍是原连接器时才清空
+                if (connectorRef.current === activeConnector) {
+                    connectorRef.current = null;
+                }
+            }
+            resetWalletState();
+        };
+
+        // 重置钱包状态
+        const resetWalletState = () => {
             setState(prev => ({
                 ...prev,
                 address: '',
@@ -225,7 +244,8 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children, chains
                 currentConnectwalletID: '',
                 provider: undefined,
             }));
-        };
+            localStorage.removeItem('lastConnectedWallet');
+        }
 
         const handleBalanceChanged = (event: Event) => {
             //账户快速切换时，旧请求可能覆盖当前账户 UI
